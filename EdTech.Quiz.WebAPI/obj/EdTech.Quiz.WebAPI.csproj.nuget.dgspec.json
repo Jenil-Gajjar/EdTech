@@ -1,0 +1,283 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.WebAPI\\EdTech.Quiz.WebAPI.csproj": {}
+  },
+  "projects": {
+    "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj",
+        "projectName": "EdTech.Quiz.Application",
+        "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj",
+        "packagesPath": "C:\\Users\\pca38\\.nuget\\packages\\",
+        "outputPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\pca38\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj": {
+                "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj",
+        "projectName": "EdTech.Quiz.Domain",
+        "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj",
+        "packagesPath": "C:\\Users\\pca38\\.nuget\\packages\\",
+        "outputPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\pca38\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Infrastructure\\EdTech.Quiz.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Infrastructure\\EdTech.Quiz.Infrastructure.csproj",
+        "projectName": "EdTech.Quiz.Infrastructure",
+        "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Infrastructure\\EdTech.Quiz.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\pca38\\.nuget\\packages\\",
+        "outputPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Infrastructure\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\pca38\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj": {
+                "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj"
+              },
+              "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj": {
+                "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Domain\\EdTech.Quiz.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.FileExtensions": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Json": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[7.0.18, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.WebAPI\\EdTech.Quiz.WebAPI.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.WebAPI\\EdTech.Quiz.WebAPI.csproj",
+        "projectName": "EdTech.Quiz.WebAPI",
+        "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.WebAPI\\EdTech.Quiz.WebAPI.csproj",
+        "packagesPath": "C:\\Users\\pca38\\.nuget\\packages\\",
+        "outputPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.WebAPI\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\pca38\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj": {
+                "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Application\\EdTech.Quiz.Application.csproj"
+              },
+              "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Infrastructure\\EdTech.Quiz.Infrastructure.csproj": {
+                "projectPath": "D:\\jenil\\.Net\\projects\\Ed Tech Quiz App\\EdTech\\EdTech.Quiz.Infrastructure\\EdTech.Quiz.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.5.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

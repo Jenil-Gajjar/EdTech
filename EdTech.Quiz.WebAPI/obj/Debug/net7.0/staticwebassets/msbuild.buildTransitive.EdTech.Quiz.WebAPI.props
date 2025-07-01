@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\EdTech.Quiz.WebAPI.props" />
+</Project>
