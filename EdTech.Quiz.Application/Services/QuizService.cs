@@ -1,8 +1,6 @@
 using EdTech.Quiz.Application.DTOs;
-using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Repositoriess;
 using EdTech.Quiz.Application.Interface.Services;
-using EdTech.Quiz.Domain.Entities;
 namespace EdTech.Quiz.Application.Services;
 using Quiz = Domain.Entities.Quiz;
 
@@ -31,17 +29,46 @@ public class QuizService : IQuizService
         return quiz.Id;
     }
 
-    public async Task<List<Quiz>> GetAllQuizzesAsync()
+    public async Task<List<QuizDTO>> GetAllQuizzesAsync()
     {
-        return await _quizRepository.GetAllQuizzesAsync();
+
+        return (await _quizRepository.GetAllQuizzesAsync()).Select(u => new QuizDTO
+        {
+            Id = u.Id,
+            Title = u.Title,
+            Questions = u.QuizQuestions.Select(u => new QuestionDTO()
+            {
+                Id = u.Question.Id,
+                Text = u.Question.Text,
+                Options = u.Question.Options.Select(u => u.Text).ToList(),
+                CorrectOption = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Text,
+                CorrectOptionId = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Id
+            }).ToList()
+        }).ToList();
+
+    }
+
+    public async Task<QuizDTO> GetQuizByIdAsync(int Id)
+    {
+        Quiz result = await _quizRepository.GetQuizByIdAsync(Id) ?? throw new Exception("Not Found");
+
+
+        QuizDTO quiz = new()
+        {
+            Id = result.Id,
+            Title = result.Title,
+            Questions = result.QuizQuestions.Select(u => new QuestionDTO()
+            {
+                Id = u.QuestionId,
+                Text = u.Question.Text,
+                Options = u.Question.Options.Select(u => u.Text).ToList(),
+                CorrectOption = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Text,
+                CorrectOptionId = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Id
+            }).ToList()
+        };
+        return quiz;
     }
 
 
-    public async Task<Quiz?> GetQuizByIdAsync(int Id)
-    {
-        return await _quizRepository.GetQuizByIdAsync(Id);
-    }
 
-
-   
 }

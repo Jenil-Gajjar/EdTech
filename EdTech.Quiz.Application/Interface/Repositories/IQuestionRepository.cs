@@ -5,12 +5,12 @@ namespace EdTech.Quiz.Application.Interface.Repositories;
 public interface IQuestionRepository
 {
     Task AddQuestionAsync(Question question);
-    Task<List<Question>> GetQuestionsByIds(List<int> ids);
 
-    Task<List<Question>> GetRandomQuestionsAsync(int QuizId, int Count);
+    Task<List<Question>> GetQuestionsByQuizIdAsync(int QuizId);
 
-    Task<Question?> GetQuestionById(int id);
     Task SaveChangesAsync();
+
+    Task<List<Question>> GetQuestionsAsync();
 
 
 }

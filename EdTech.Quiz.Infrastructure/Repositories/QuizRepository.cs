@@ -1,5 +1,4 @@
 using EdTech.Quiz.Application.Interface.Repositoriess;
-using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

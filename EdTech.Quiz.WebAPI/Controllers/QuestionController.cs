@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EdTech.Quiz.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 public class QuestionController : Controller
 {
     private readonly IQuestionService _questionService;
@@ -18,15 +18,82 @@ public class QuestionController : Controller
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateQuestionDTO dto)
     {
-        var result = await _questionService.CreateQuestionAsync(dto);
-        return Ok(result);
+        try
+        {
+
+            int result = await _questionService.CreateQuestionAsync(dto);
+            return Ok(new ApiResponse<object>()
+            {
+                IsSuccess = true,
+                Data = result,
+                Message = "Question Created Successfully!"
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new ApiResponse<string>()
+            {
+                IsSuccess = false,
+                Data = e.Message,
+                Message = "An error occurred while processing request.",
+            });
+        }
     }
 
-    [HttpGet("random")]
+    [HttpGet("{QuizId}/{Count}")]
 
-    public async Task<IActionResult> GetRandom(int QuizId, int Count)
+    public async Task<IActionResult> GetRandomQuestions(int QuizId, int Count)
     {
-        var result = await _questionService.GetRandomQuestionsAsync(QuizId, Count);
-        return Ok(result);
+
+        try
+        {
+            List<QuestionDTO> result = await _questionService.GetRandomQuestionsByQuizIdAsync(QuizId, Count);
+            return Ok(new ApiResponse<object>()
+            {
+                IsSuccess = true,
+                Data = result,
+                Message = $"Total Records: {result.Count}"
+            });
+        }
+        catch (Exception e)
+        {
+
+            return StatusCode(500, new ApiResponse<string>()
+            {
+                IsSuccess = false,
+                Data = e.Message,
+                Message = "An error occurred while processing request.",
+            });
+        }
+
     }
+    [HttpGet("{Count}")]
+
+    public async Task<IActionResult> GetRandomQuestions(int Count)
+    {
+        try
+        {
+            List<QuestionDTO> result = await _questionService.GetRandomQuestionsAsync(Count);
+            return Ok(new ApiResponse<object>()
+            {
+                IsSuccess = true,
+                Data = result,
+                Message = $"Total Records: {result.Count}"
+            }); ;
+        }
+        catch (Exception e)
+        {
+
+            return StatusCode(500, new ApiResponse<string>()
+            {
+                IsSuccess = false,
+                Data = e.Message,
+                Message = "An error occurred while processing request.",
+            });
+        }
+    }
+
+
+
+
 }

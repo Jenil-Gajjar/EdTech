@@ -9,7 +9,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     public AppDbContext CreateDbContext(string[] args)
     {
 
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../EdTech.Quiz.WebAPI");
+        string basePath = Path.Combine(Directory.GetCurrentDirectory(), "../EdTech.Quiz.WebAPI");
         IConfigurationRoot configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)
             .AddJsonFile("appsettings.json")
@@ -17,7 +17,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 
         DbContextOptionsBuilder<AppDbContext>? builder = new();
 
-        var connectionString = configuration.GetConnectionString("MyConnectionString");
+        string? connectionString = configuration.GetConnectionString("MyConnectionString");
         builder.UseNpgsql(connectionString);
 
         return new AppDbContext(builder.Options);

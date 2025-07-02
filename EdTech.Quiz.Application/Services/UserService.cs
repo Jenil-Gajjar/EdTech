@@ -22,8 +22,4 @@ public class UserService : IUserService
 
     }
 
-    public async Task<User?> GetUserByIdAsync(int Id)
-    {
-        return await _userRepository.GetUserByIdAsync(Id);
-    }
 }

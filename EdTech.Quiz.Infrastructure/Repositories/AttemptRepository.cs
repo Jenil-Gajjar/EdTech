@@ -2,6 +2,7 @@ using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using EdTech.Quiz.Application.DTOs;
 
 namespace EdTech.Quiz.Infrastructure.Repositories;
 
@@ -19,19 +20,13 @@ public class AttemptRepository : IAttemptRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<UserQuizAttempt?> GetCurrentAttemptAsync(int QuizId, int Userid)
-    {
-        return await _context.UserQuizAttempts.FirstOrDefaultAsync(uq => uq.QuizId == QuizId && uq.UserId == Userid);
-    }
-
     public async Task<List<UserQuizAttempt>> GetQuizAttemptsByIdAsync(int Userid)
     {
-        return await _context.UserQuizAttempts.Include(u => u.User).Include(u => u.Quiz).Where(u => u.UserId == Userid).ToListAsync();
+        return await _context.UserQuizAttempts.Where(u => u.UserId == Userid).Include(u => u.User).Include(u => u.Quiz).ToListAsync();
     }
-
-
-    public async Task SaveChangesAsync()
+    public async Task<bool> HasUserAttemptedQuizAsync(UserQuizAttemptDTO dto)
     {
-        await _context.SaveChangesAsync();
+        return  await _context.UserQuizAttempts.AnyAsync(u=>u.UserId == dto.UserId  && u.QuizId == dto.QuizId);
     }
+
 }

@@ -20,26 +20,19 @@ public class QuestionRepository : IQuestionRepository
 
     }
 
-    public async Task<Question?> GetQuestionById(int Id)
-    {
-        return await _context.Questions.Include(u => u.Options).FirstOrDefaultAsync(q => q.Id == Id);
-    }
 
-    public async Task<List<Question>> GetQuestionsByIds(List<int> ids)
-    {
-        return await _context.Questions.Include(q => q.Options).Where(q => ids.Contains(q.Id)).ToListAsync();
-    }
-
-
-    public async Task<List<Question>> GetRandomQuestionsAsync(int QuizId, int Count)
+    public async Task<List<Question>> GetQuestionsByQuizIdAsync(int QuizId)
     {
         return await _context.QuizQuestions
                         .Where(u => u.QuizId == QuizId)
+                        .Include(u => u.Question).ThenInclude(u => u.Options)
                         .Select(u => u.Question)
-                        .Include(u => u.Options)
-                        .Take(Count)
-                        .OrderBy(x => Guid.NewGuid())
                         .ToListAsync();
+    }
+
+    public async Task<List<Question>> GetQuestionsAsync()
+    {
+        return await _context.Questions.Include(u => u.Options).ToListAsync();
     }
 
     public async Task SaveChangesAsync()

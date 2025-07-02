@@ -30,15 +30,40 @@ public class QuestionService : IQuestionService
         question.CorrectOptionId = ((List<Option>)question.Options)[dto.CorrectOptionIndex].Id;
 
         await _questionRepository.SaveChangesAsync();
-
         return question.Id;
 
     }
 
 
-    public async Task<List<Question>> GetRandomQuestionsAsync(int QuizId, int Count)
+    public async Task<List<QuestionDTO>> GetRandomQuestionsByQuizIdAsync(int QuizId, int Count)
     {
-        return await _questionRepository.GetRandomQuestionsAsync(QuizId, Count);
+
+        List<QuestionDTO> result = (await _questionRepository.GetQuestionsByQuizIdAsync(QuizId)).Select(u => new QuestionDTO()
+        {
+            Id = u.Id,
+            Text = u.Text,
+            Options = u.Options.Select(u => u.Text).ToList(),
+            CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
+            CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
+        }).OrderBy(x => Guid.NewGuid()).Take(Count).ToList();
+
+        return result;
     }
+
+    public async Task<List<QuestionDTO>> GetRandomQuestionsAsync(int Count)
+    {
+        List<QuestionDTO> result = (await _questionRepository.GetQuestionsAsync()).Select(u => new QuestionDTO()
+        {
+            Id = u.Id,
+            Text = u.Text,
+            Options = u.Options.Select(u => u.Text).ToList(),
+            CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
+            CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
+
+        }).OrderBy(x => Guid.NewGuid()).Take(Count).ToList();
+
+        return result;
+    }
+
 
 }

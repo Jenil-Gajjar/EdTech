@@ -1,6 +1,7 @@
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
+using EdTech.Quiz.Domain.Entities;
 
 
 namespace EdTech.Quiz.Application.Services;
@@ -17,38 +18,61 @@ public class AttemptService : IAttemptService
         _questionRepository = questionRepository;
     }
 
-    public async Task<List<UserQuizAttemptDTO>> GetUserQuizHistoryAsync(int UserId)
+    public async Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId)
     {
-        var attempts = await _attemptRepository.GetQuizAttemptsByIdAsync(UserId);
-        return attempts.Select(u => new UserQuizAttemptDTO
+        List<UserQuizAttempt> attempts = await _attemptRepository.GetQuizAttemptsByIdAsync(UserId);
+
+        List<QuizDTO> Quiz = attempts.Select(u => new QuizDTO()
         {
-            Name = u.User.Name,
-            QuizId = u.QuizId,
-            QuizTitle = u.Quiz.Title,
-            Score = u.Score,
-            TimeTaken = u.CompletedAt!.Value - u.StartedAt
+            Title = u.Quiz.Title,
+            Score = u.Score
         }).ToList();
+
+        return new UserQuizHistoryDTO()
+        {
+            Name = attempts.First().User.Name,
+            Quizzes = Quiz
+        };
     }
 
 
-    public async Task<QuizResultDTO> SubmitAttemptAsync(SubmitAttemptDTO dto)
+    public async Task<QuizResultDTO> SubmitAttemptAsync(UserQuizAttemptDTO dto)
     {
-        var attempt = await _attemptRepository.GetCurrentAttemptAsync(QuizId: dto.QuizId, Userid: dto.UserId) ?? throw new Exception("Attempt Not Found!");
+        if (await _attemptRepository.HasUserAttemptedQuizAsync(dto)) throw new Exception("User has already attempted this quiz");
+
+        List<Question> questions = await _questionRepository.GetQuestionsByQuizIdAsync(dto.QuizId) ?? throw new Exception("Quiz Not Found");
+
+
+        UserQuizAttempt attempt = new()
+        {
+            UserId = dto.UserId,
+            QuizId = dto.QuizId,
+            StartedAt = DateTime.UtcNow
+        };
 
         int correct = 0;
 
         foreach (UserAnswerDTO answer in dto.Answers)
         {
-            var question = await _questionRepository.GetQuestionById(answer.QuestionId);
-            if (question != null)
-                if (question.CorrectOptionId == answer.SelectedOptionId) correct++;
+            Question? question = questions.FirstOrDefault(u => u.Id == answer.QuestionId);
+            if (question == null) continue;
+
+            if (question.CorrectOptionId == answer.SelectedOptionId) correct++;
+            attempt.Answers.Add(new UserAnswer
+            {
+                QuestionId = answer.QuestionId,
+                SelectedOptionId = answer.SelectedOptionId
+            });
 
         }
         attempt.CompletedAt = DateTime.UtcNow;
+        attempt.Score = Math.Round((double)correct / dto.Answers.Count * 100, 2);
+
+        await _attemptRepository.AddAttemptAsync(attempt);
 
         return new QuizResultDTO
         {
-            Score = correct,
+            Score = attempt.Score,
             TimeTaken = attempt.CompletedAt.Value - attempt.StartedAt
         };
     }

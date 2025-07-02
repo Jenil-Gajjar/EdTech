@@ -7,7 +7,6 @@ public class Question
 
     public ICollection<Option> Options { get; set; } = new List<Option>();
     public int CorrectOptionId { get; set; }
-    // public Option? CorrectOption { get; set; }
 
     public List<QuizQuestion> QuizQuestions { get; set; } = null!;
 
