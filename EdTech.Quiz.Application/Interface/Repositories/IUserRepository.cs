@@ -6,5 +6,6 @@ public interface IUserRepository
 {
     Task AddUserAsync(User user);
     Task SaveChangesAsync();
+    Task<bool> DoesUserAlreadyExists(string name);
 
 }

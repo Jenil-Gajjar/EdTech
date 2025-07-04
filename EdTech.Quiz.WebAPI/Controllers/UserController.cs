@@ -61,6 +61,33 @@ public class UserController : Controller
     }
 
     [HttpPost]
+    public async Task<IActionResult> StartAttemptAsync([FromBody] StartQuizAttemptDTO dto)
+    {
+        try
+        {
+
+            int result = await _attemptService.StartAttemptAsync(dto);
+            return Ok(new ApiResponse<object>()
+            {
+                IsSuccess = true,
+                Data = result,
+                Message = "Quiz Started Successfully!"
+            });
+        }
+        catch (Exception e)
+        {
+
+            return StatusCode(500, new ApiResponse<string>()
+            {
+                IsSuccess = false,
+                Data = e.Message,
+                Message = "An error occurred while processing request.",
+            });
+        }
+
+    }
+
+    [HttpPost]
     public async Task<IActionResult> SubmitAttemptAsync(UserQuizAttemptDTO dto)
     {
         try

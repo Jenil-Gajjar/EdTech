@@ -6,7 +6,5 @@ public class QuizDTO
 
     public string Title { get; set; } = string.Empty;
 
-    public double Score { get; set; }
-
     public List<QuestionDTO> Questions { get; set; } = new();
 }

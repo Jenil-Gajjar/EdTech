@@ -16,9 +16,10 @@ public class QuestionService : IQuestionService
     }
     public async Task<int> CreateQuestionAsync(CreateQuestionDTO dto)
     {
+        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question Already Exists");
         Question question = new()
         {
-            Text = dto.Text
+            Text = dto.Text.Trim()
         };
         foreach (string optionText in dto.Options)
         {

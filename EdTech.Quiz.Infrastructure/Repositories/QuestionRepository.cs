@@ -30,6 +30,11 @@ public class QuestionRepository : IQuestionRepository
                         .ToListAsync();
     }
 
+    public async Task<bool> DoesQuestionAlreadyExists(string question)
+    {
+        return await _context.Questions.AnyAsync(u => u.Text.Trim().ToLower() == question.Trim().ToLower());
+    }
+
     public async Task<List<Question>> GetQuestionsAsync()
     {
         return await _context.Questions.Include(u => u.Options).ToListAsync();

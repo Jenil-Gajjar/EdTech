@@ -14,12 +14,15 @@ public class UserService : IUserService
 
     public async Task<int> CreateUserAsync(CreateUserDTO dto)
     {
+        if(await _userRepository.DoesUserAlreadyExists(dto.Name)) throw new Exception("Name already exists");
 
-        User user = new() { Name = dto.Name };
+        User user = new() { Name = dto.Name.Trim() };
         await _userRepository.AddUserAsync(user);
         await _userRepository.SaveChangesAsync();
         return user.Id;
 
     }
+
+   
 
 }

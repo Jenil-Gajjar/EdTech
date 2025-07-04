@@ -15,9 +15,13 @@ public class QuizService : IQuizService
 
     public async Task<int> CreateQuizAsync(CreateQuizDTO dto)
     {
+        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new Exception("Quiz Already Exits");
+
+        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid Question Ids");
+
         Quiz quiz = new()
         {
-            Title = dto.Title
+            Title = dto.Title.Trim()
         };
         foreach (int id in dto.QuestionIds)
         {
@@ -50,8 +54,7 @@ public class QuizService : IQuizService
 
     public async Task<QuizDTO> GetQuizByIdAsync(int Id)
     {
-        Quiz result = await _quizRepository.GetQuizByIdAsync(Id) ?? throw new Exception("Not Found");
-
+        Quiz result = await _quizRepository.GetQuizByIdAsync(Id) ?? throw new Exception("Quiz Not Found");
 
         QuizDTO quiz = new()
         {

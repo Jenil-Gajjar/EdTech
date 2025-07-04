@@ -14,19 +14,29 @@ public class AttemptRepository : IAttemptRepository
     {
         _context = context;
     }
-    public async Task AddAttemptAsync(UserQuizAttempt attempt)
+    public async Task<int> AddAttemptAsync(UserQuizAttempt attempt)
     {
         await _context.UserQuizAttempts.AddAsync(attempt);
         await _context.SaveChangesAsync();
+        return attempt.Id;
+    }
+    public async Task EditAttemptAsync(UserQuizAttempt attempt)
+    {
+        _context.UserQuizAttempts.Update(attempt);
+        await _context.SaveChangesAsync();
     }
 
+    public async Task<UserQuizAttempt?> GetUserQuizAttemptAsync(int UserId, int QuizId)
+    {
+        return await _context.UserQuizAttempts.Include(u => u.User).FirstOrDefaultAsync(u => u.UserId == UserId && u.QuizId == QuizId);
+    }
     public async Task<List<UserQuizAttempt>> GetQuizAttemptsByIdAsync(int Userid)
     {
         return await _context.UserQuizAttempts.Where(u => u.UserId == Userid).Include(u => u.User).Include(u => u.Quiz).ToListAsync();
     }
-    public async Task<bool> HasUserAttemptedQuizAsync(UserQuizAttemptDTO dto)
+    public async Task<bool> HasUserAttemptedQuizAsync(StartQuizAttemptDTO dto)
     {
-        return  await _context.UserQuizAttempts.AnyAsync(u=>u.UserId == dto.UserId  && u.QuizId == dto.QuizId);
+        return await _context.UserQuizAttempts.AnyAsync(u => u.UserId == dto.UserId && u.QuizId == dto.QuizId);
     }
 
 }
