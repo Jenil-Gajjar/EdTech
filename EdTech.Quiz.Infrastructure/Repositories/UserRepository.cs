@@ -29,4 +29,8 @@ public class UserRepository : IUserRepository
     {
         await _context.SaveChangesAsync();
     }
+    public async Task<List<UserQuizAttempt>> GetQuizAttemptsByIdAsync(int Userid)
+    {
+        return await _context.UserQuizAttempts.Where(u => u.UserId == Userid).Include(u => u.User).Include(u => u.Quiz).ToListAsync();
+    }
 }

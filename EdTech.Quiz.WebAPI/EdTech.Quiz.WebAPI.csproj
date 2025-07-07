@@ -10,7 +10,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EdTech.Quiz.Application\EdTech.Quiz.Application.csproj" />
     <ProjectReference Include="..\EdTech.Quiz.Infrastructure\EdTech.Quiz.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

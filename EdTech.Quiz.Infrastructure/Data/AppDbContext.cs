@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Quiz> Quizzes => Set<Quiz>();
     public DbSet<Question> Questions => Set<Question>();
+    public DbSet<Option> Options => Set<Option>();
     public DbSet<QuizQuestion> QuizQuestions => Set<QuizQuestion>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserQuizAttempt> UserQuizAttempts => Set<UserQuizAttempt>();

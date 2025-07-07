@@ -1,3 +1,4 @@
+using System.Net;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ public class QuestionController : Controller
         {
 
             int result = await _questionService.CreateQuestionAsync(dto);
-            return Ok(new ApiResponse<object>()
+            return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
             {
                 IsSuccess = true,
                 Data = result,
@@ -31,7 +32,7 @@ public class QuestionController : Controller
         }
         catch (Exception e)
         {
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
             {
                 IsSuccess = false,
                 Data = e.Message,
@@ -57,8 +58,7 @@ public class QuestionController : Controller
         }
         catch (Exception e)
         {
-
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
             {
                 IsSuccess = false,
                 Data = e.Message,
@@ -84,7 +84,7 @@ public class QuestionController : Controller
         catch (Exception e)
         {
 
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
             {
                 IsSuccess = false,
                 Data = e.Message,
