@@ -8,4 +8,6 @@ public interface IUserRepository
     Task SaveChangesAsync();
     Task<bool> DoesUserAlreadyExists(string name);
 
+    Task<List<UserQuizAttempt>> GetQuizAttemptsByIdAsync(int Userid);
+
 }

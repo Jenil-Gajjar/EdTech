@@ -36,10 +36,9 @@ public class QuizRepository : IQuizRepository
         return await _context.Quizzes.Include(u => u.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).ToListAsync();
     }
 
-
     public async Task<Quiz?> GetQuizByIdAsync(int Id)
     {
-        return await _context.Quizzes.Include(q => q.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).FirstOrDefaultAsync(q => q.Id == Id);
+        return await _context.Quizzes.AsSplitQuery().Include(q => q.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).FirstOrDefaultAsync(q => q.Id == Id);
     }
 
 

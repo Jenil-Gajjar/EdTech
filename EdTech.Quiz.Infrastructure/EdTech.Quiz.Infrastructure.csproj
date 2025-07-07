@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\EdTech.Quiz.Application\EdTech.Quiz.Application.csproj" />
-    <ProjectReference Include="..\EdTech.Quiz.Domain\EdTech.Quiz.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />

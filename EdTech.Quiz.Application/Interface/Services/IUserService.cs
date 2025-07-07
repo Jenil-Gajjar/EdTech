@@ -6,4 +6,6 @@ public interface IUserService
 {
     Task<int> CreateUserAsync(CreateUserDTO dto);
 
+    Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId);
+
 }

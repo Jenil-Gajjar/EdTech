@@ -1,3 +1,4 @@
+using System.Net;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,19 +11,21 @@ public class QuizController : Controller
 {
 
     private readonly IQuizService _quizService;
-    public QuizController(IQuizService quizService)
+
+    private readonly IAttemptService _attemptService;
+    public QuizController(IQuizService quizService, IAttemptService attemptService)
     {
         _quizService = quizService;
+        _attemptService = attemptService;
     }
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateQuizDTO dto)
     {
         try
         {
-
             int result = await _quizService.CreateQuizAsync(dto);
 
-            return Ok(new ApiResponse<object>()
+            return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
             {
                 Data = result,
                 IsSuccess = true,
@@ -31,7 +34,7 @@ public class QuizController : Controller
         }
         catch (Exception e)
         {
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
             {
                 IsSuccess = false,
                 Data = e.Message,
@@ -41,7 +44,7 @@ public class QuizController : Controller
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> GetQuiz(int id)
     {
         try
         {
@@ -55,7 +58,7 @@ public class QuizController : Controller
         }
         catch (Exception e)
         {
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
             {
                 IsSuccess = false,
                 Data = e.Message,
@@ -65,7 +68,7 @@ public class QuizController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetQuizzes()
     {
         try
         {
@@ -75,13 +78,12 @@ public class QuizController : Controller
                 Data = result,
                 IsSuccess = true,
                 Message = $"Total Records: {result.Count}"
-
             });
         }
         catch (Exception e)
         {
 
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
             {
                 IsSuccess = false,
                 Data = e.Message,
@@ -90,5 +92,56 @@ public class QuizController : Controller
         }
     }
 
+
+    [HttpPost]
+    public async Task<IActionResult> StartAttempt([FromBody] StartQuizAttemptDTO dto)
+    {
+        try
+        {
+
+            int result = await _attemptService.StartAttemptAsync(dto);
+            return Ok(new ApiResponse<object>()
+            {
+                IsSuccess = true,
+                Data = result,
+                Message = "Quiz Started Successfully!"
+            });
+        }
+        catch (Exception e)
+        {
+
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            {
+                IsSuccess = false,
+                Data = e.Message,
+                Message = "An error occurred while processing request.",
+            });
+        }
+
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SubmitAttempt(UserQuizAttemptDTO dto)
+    {
+        try
+        {
+            QuizResultDTO result = await _attemptService.SubmitAttemptAsync(dto);
+            return Ok(new ApiResponse<object>()
+            {
+                IsSuccess = true,
+                Data = result,
+                Message = "Attempt Saved Successfully!"
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            {
+                IsSuccess = false,
+                Data = e.Message,
+                Message = "An error occurred while processing request.",
+            });
+        }
+    }
 
 }
