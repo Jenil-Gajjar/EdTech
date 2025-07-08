@@ -17,10 +17,16 @@ public class QuestionService : IQuestionService
     public async Task<int> CreateQuestionAsync(CreateQuestionDTO dto)
     {
         if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question already exists");
+
+        if (!dto.Options.Any()) throw new Exception("Options are required");
+
+        if (dto.CorrectOptionIndex < 0 || dto.CorrectOptionIndex >= dto.Options.Count) throw new Exception("Invalid correct option index");
+        
         Question question = new()
         {
             Text = dto.Text.Trim()
         };
+
         foreach (string optionText in dto.Options)
         {
             question.Options.Add(new() { Text = optionText });

@@ -8,7 +8,7 @@ public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepository;
 
-    public QuizService(Interface.Repositories.IQuestionRepository @object, IQuizRepository quizRepository)
+    public QuizService(IQuizRepository quizRepository)
     {
         _quizRepository = quizRepository;
     }
