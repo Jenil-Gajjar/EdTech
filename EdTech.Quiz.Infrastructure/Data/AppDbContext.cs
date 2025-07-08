@@ -28,7 +28,6 @@ public class AppDbContext : DbContext
             entity.HasKey(qq => new { qq.QuestionId, qq.QuizId });
             entity.HasOne(qq => qq.Quiz).WithMany(qq => qq.QuizQuestions).HasForeignKey(qq => qq.QuizId);
             entity.HasOne(qq => qq.Question).WithMany(qq => qq.QuizQuestions).HasForeignKey(qq => qq.QuestionId);
-
         });
 
         modelBuilder.Entity<UserAnswer>()

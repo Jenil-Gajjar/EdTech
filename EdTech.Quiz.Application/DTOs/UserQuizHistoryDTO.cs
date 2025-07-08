@@ -2,7 +2,6 @@ namespace EdTech.Quiz.Application.DTOs;
 
 public class UserQuizHistoryDTO
 {
-
     public class QuizDetails
     {
         public string Title { get; set; } = string.Empty;

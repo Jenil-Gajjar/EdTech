@@ -11,6 +11,7 @@ public class AttemptService : IAttemptService
     private readonly IAttemptRepository _attemptRepository;
     private readonly IQuestionRepository _questionRepository;
 
+    private readonly TimeSpan MaxDuration = TimeSpan.FromMinutes(30);
 
     public AttemptService(IAttemptRepository attemptRepository, IQuestionRepository questionRepository)
     {
@@ -18,7 +19,7 @@ public class AttemptService : IAttemptService
         _questionRepository = questionRepository;
     }
 
- 
+
 
     public async Task<int> StartAttemptAsync(StartQuizAttemptDTO dto)
     {
@@ -35,33 +36,26 @@ public class AttemptService : IAttemptService
 
     }
 
+    private bool IsAttemptWithinTimeLimit(UserQuizAttempt attempt)
+    {
+        TimeSpan? duration = attempt.CompletedAt - attempt.StartedAt;
+        return duration <= MaxDuration;
+    }
+
     public async Task<QuizResultDTO> SubmitAttemptAsync(UserQuizAttemptDTO dto)
     {
 
-        List<Question> questions = await _questionRepository.GetQuestionsByQuizIdAsync(dto.QuizId) ?? throw new Exception("Quiz Not Found");
+        List<Question> questions = await _questionRepository.GetQuestionsByQuizIdAsync(dto.QuizId) ?? throw new Exception("Quiz not found");
 
-        UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new Exception("Please Start Quiz First");
+        UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new Exception("Please start quiz first");
 
         if (attempt.CompletedAt is not null) throw new Exception("You have already completed this quiz");
-
         attempt.CompletedAt = DateTime.UtcNow;
-        int correct = 0;
 
-        foreach (UserAnswerDTO answer in dto.Answers)
-        {
-            Question? question = questions.FirstOrDefault(u => u.Id == answer.QuestionId);
-            if (question == null) continue;
+        if (!IsAttemptWithinTimeLimit(attempt)) throw new Exception("Quiz attempt exceeded 30-minute time limit.");
 
-            if (question.CorrectOptionId == answer.SelectedOptionId) correct++;
-            attempt.Answers.Add(new UserAnswer
-            {
-                QuestionId = answer.QuestionId,
-                SelectedOptionId = answer.SelectedOptionId
-            });
 
-        }
-
-        attempt.Score = Math.Round((double)correct / dto.Answers.Count * 100, 2);
+        attempt.Score = CalculateScore(attempt, dto, questions);
 
         await _attemptRepository.EditAttemptAsync(attempt);
 
@@ -76,5 +70,22 @@ public class AttemptService : IAttemptService
             TimeTaken = attempt.CompletedAt.Value - attempt.StartedAt
         };
     }
+    public static double CalculateScore(UserQuizAttempt attempt, UserQuizAttemptDTO dto, List<Question> questions)
+    {
+        int correct = 0;
+        foreach (UserAnswerDTO answer in dto.Answers)
+        {
+            Question? question = questions.FirstOrDefault(u => u.Id == answer.QuestionId);
+            if (question == null) continue;
 
+            if (question.CorrectOptionId == answer.SelectedOptionId) correct++;
+            attempt.Answers.Add(new UserAnswer
+            {
+                QuestionId = answer.QuestionId,
+                SelectedOptionId = answer.SelectedOptionId
+            });
+        }
+
+        return Math.Round((double)correct / dto.Answers.Count * 100, 2);
+    }
 }

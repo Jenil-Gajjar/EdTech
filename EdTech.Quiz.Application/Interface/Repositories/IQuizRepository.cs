@@ -9,5 +9,4 @@ public interface IQuizRepository
     Task<Quiz?> GetQuizByIdAsync(int Id);
     Task<List<Quiz>> GetAllQuizzesAsync();
     Task SaveChangesAsync();
-
 }

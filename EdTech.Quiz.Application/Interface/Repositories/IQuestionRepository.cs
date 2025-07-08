@@ -10,5 +10,4 @@ public interface IQuestionRepository
     Task SaveChangesAsync();
     Task<List<Question>> GetQuestionsAsync();
 
-
 }

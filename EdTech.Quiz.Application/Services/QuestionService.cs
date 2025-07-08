@@ -16,7 +16,7 @@ public class QuestionService : IQuestionService
     }
     public async Task<int> CreateQuestionAsync(CreateQuestionDTO dto)
     {
-        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question Already Exists");
+        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question already exists");
         Question question = new()
         {
             Text = dto.Text.Trim()
@@ -43,7 +43,11 @@ public class QuestionService : IQuestionService
         {
             Id = u.Id,
             Text = u.Text,
-            Options = u.Options.Select(u => u.Text).ToList(),
+            Options = u.Options.Select(x => new OptionDTO()
+            {
+                Id = x.Id,
+                Text = x.Text
+            }).ToList(),
             CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
             CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
         }).OrderBy(x => Guid.NewGuid()).Take(Count).ToList();
@@ -57,7 +61,11 @@ public class QuestionService : IQuestionService
         {
             Id = u.Id,
             Text = u.Text,
-            Options = u.Options.Select(u => u.Text).ToList(),
+            Options = u.Options.Select(x => new OptionDTO()
+            {
+                Id = x.Id,
+                Text = x.Text
+            }).ToList(),
             CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
             CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
 

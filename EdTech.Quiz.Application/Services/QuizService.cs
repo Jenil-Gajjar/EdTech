@@ -8,16 +8,16 @@ public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepository;
 
-    public QuizService(IQuizRepository quizRepository)
+    public QuizService(Interface.Repositories.IQuestionRepository @object, IQuizRepository quizRepository)
     {
         _quizRepository = quizRepository;
     }
 
     public async Task<int> CreateQuizAsync(CreateQuizDTO dto)
     {
-        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new Exception("Quiz Already Exits");
+        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new Exception("Quiz already exits");
 
-        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid Question Ids");
+        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid question ids");
 
         Quiz quiz = new()
         {
@@ -44,7 +44,11 @@ public class QuizService : IQuizService
             {
                 Id = u.Question.Id,
                 Text = u.Question.Text,
-                Options = u.Question.Options.Select(u => u.Text).ToList(),
+                Options = u.Question.Options.Select(x => new OptionDTO()
+                {
+                    Id = x.Id,
+                    Text = x.Text
+                }).ToList(),
                 CorrectOption = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Text,
                 CorrectOptionId = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Id
             }).ToList()
@@ -54,7 +58,7 @@ public class QuizService : IQuizService
 
     public async Task<QuizDTO> GetQuizByIdAsync(int Id)
     {
-        Quiz result = await _quizRepository.GetQuizByIdAsync(Id) ?? throw new Exception("Quiz Not Found");
+        Quiz result = await _quizRepository.GetQuizByIdAsync(Id) ?? throw new Exception("Quiz not found");
 
         QuizDTO quiz = new()
         {
@@ -64,7 +68,11 @@ public class QuizService : IQuizService
             {
                 Id = u.QuestionId,
                 Text = u.Question.Text,
-                Options = u.Question.Options.Select(u => u.Text).ToList(),
+                Options = u.Question.Options.Select(x => new OptionDTO()
+                {
+                    Id = x.Id,
+                    Text = x.Text
+                }).ToList(),
                 CorrectOption = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Text,
                 CorrectOptionId = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Id
             }).ToList()
