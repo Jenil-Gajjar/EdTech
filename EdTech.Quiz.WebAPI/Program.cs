@@ -18,15 +18,27 @@ var ConnectionString = builder.Configuration.GetConnectionString("MyConnectionSt
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(ConnectionString));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowInfernoApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IAttemptService, AttemptService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
@@ -42,6 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors("AllowInfernoApp");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 

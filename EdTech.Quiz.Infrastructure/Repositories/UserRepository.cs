@@ -22,7 +22,7 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> DoesUserAlreadyExists(string name)
     {
-        return await _context.Users.AnyAsync(u => u.Name.Trim().ToLower() == name.Trim().ToLower());
+        return await _context.Users.AnyAsync(u => u.UserName.Trim().ToLower() == name.Trim().ToLower());
     }
 
     public async Task SaveChangesAsync()

@@ -35,29 +35,28 @@ public class UserController : Controller
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateUserDTO dto)
-    {
-        try
-        {
-            int result = await _userService.CreateUserAsync(dto);
-            return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
-            {
-                IsSuccess = true,
-                Data = result,
-                Message = "User Created Successfully!"
-            });
-        }
-        catch (Exception e)
-        {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
-            {
-                IsSuccess = false,
-                Data = e.Message,
-                Message = "An error occurred while processing request.",
-            });
-        }
-    }
+    // [HttpPost]
+    // public async Task<IActionResult> Create([FromBody] CreateUserDTO dto)
+    // {
+    //     try
+    //     {
+    //         int result = await _userService.CreateUserAsync(dto);
+    //         return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
+    //         {
+    //             IsSuccess = true,
+    //             Data = result,
+    //             Message = "User Created Successfully!"
+    //         });
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+    //         {
+    //             IsSuccess = false,
+    //             Data = e.Message,
+    //             Message = "An error occurred while processing request.",
+    //         });
+    //     }
+    // }
 
-    
 }

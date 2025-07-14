@@ -63,7 +63,7 @@ public class AttemptService : IAttemptService
         {
 
             AttemptId = attempt.Id,
-            Name = attempt.User.Name,
+            Name = attempt.User.UserName,
             QuizId = dto.QuizId,
             UserId = dto.UserId,
             Score = attempt.Score,

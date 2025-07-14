@@ -15,17 +15,14 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-
-
     public async Task<int> CreateUserAsync(CreateUserDTO dto)
     {
         if (await _userRepository.DoesUserAlreadyExists(dto.Name)) throw new Exception("Name already exists");
 
-        User user = new() { Name = dto.Name.Trim() };
+        User user = new() { UserName = dto.Name.Trim() };
         await _userRepository.AddUserAsync(user);
         await _userRepository.SaveChangesAsync();
         return user.Id;
-
     }
 
     public async Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId)
@@ -41,7 +38,7 @@ public class UserService : IUserService
 
         return new UserQuizHistoryDTO()
         {
-            Name = attempts.First().User.Name,
+            Name = attempts.First().User.UserName,
             Quizzes = Quiz
         };
     }
