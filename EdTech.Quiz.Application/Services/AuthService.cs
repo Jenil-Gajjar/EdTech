@@ -1,17 +1,19 @@
-using BCrypt.Net;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
 using EdTech.Quiz.Domain.Entities;
+using EdTech.Quiz.Domain.Enums;
 namespace EdTech.Quiz.Application.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IAuthRepository _authRepository;
 
-    public AuthService(IAuthRepository authRepository)
+    private readonly IJwtTokenService _jwtTokenService;
+    public AuthService(IAuthRepository authRepository, IJwtTokenService jwtTokenService)
     {
         _authRepository = authRepository;
+        _jwtTokenService = jwtTokenService;
     }
 
     public async Task<ResponseDTO> SignIn(LoginDTO dto)
@@ -29,11 +31,15 @@ public class AuthService : IAuthService
         bool verified = BCrypt.Net.BCrypt.Verify(dto.Password.Trim(), user.Password.Trim());
 
         if (verified)
+        {
+            string jwtToken = _jwtTokenService.GenerateToken(user.Id, user.Role.RoleName);
             return new()
             {
+                Data = jwtToken,
                 IsSuccess = true,
                 Message = "Login Successfull."
             };
+        }
 
         else
             return new()
@@ -41,9 +47,7 @@ public class AuthService : IAuthService
                 IsSuccess = false,
                 Message = "Invalid Username or Password."
             };
-
     }
-
 
     public async Task<ResponseDTO> SignUp(RegisterDTO dto)
     {
@@ -53,7 +57,8 @@ public class AuthService : IAuthService
         {
             UserName = dto.Username.Trim(),
             Email = dto.Email.Trim(),
-            Password = passwordHash.Trim()
+            Password = passwordHash.Trim(),
+            RoleId = (int)RoleEnum.User
         };
         return await _authRepository.CreateUser(user);
     }

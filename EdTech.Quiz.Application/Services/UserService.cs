@@ -36,6 +36,8 @@ public class UserService : IUserService
             TimeTaken = u.CompletedAt == null ? TimeSpan.Zero : u.CompletedAt.Value - u.StartedAt
         }).ToList();
 
+        if(attempts == null || !attempts.Any()) 
+            throw new Exception("No Attempts Found!");
         return new UserQuizHistoryDTO()
         {
             Name = attempts.First().User.UserName,

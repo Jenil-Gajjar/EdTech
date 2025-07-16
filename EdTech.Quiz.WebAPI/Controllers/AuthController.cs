@@ -1,11 +1,13 @@
 using System.Net;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdTech.Quiz.WebAPI.Controllers;
 
 [Route("api/[controller]/[action]")]
+[AllowAnonymous]
 public class AuthController : Controller
 {
 
@@ -27,12 +29,12 @@ public class AuthController : Controller
 
         try
         {
-
             ResponseDTO responseDTO = await _authService.SignIn(dto);
             if (responseDTO.IsSuccess)
             {
-                return StatusCode((int)HttpStatusCode.OK, new ApiResponse<string>()
+                return StatusCode((int)HttpStatusCode.OK, new ApiResponse<object>()
                 {
+                    Data = responseDTO.Data,
                     IsSuccess = true,
                     Message = responseDTO.Message,
                 });

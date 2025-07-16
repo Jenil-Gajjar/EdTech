@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EdTech.Quiz.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250701095507_InitialCreate")]
+    [Migration("20250716050953_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -44,7 +44,7 @@ namespace EdTech.Quiz.Infrastructure.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Option");
+                    b.ToTable("Options");
                 });
 
             modelBuilder.Entity("EdTech.Quiz.Domain.Entities.Question", b =>
@@ -99,6 +99,23 @@ namespace EdTech.Quiz.Infrastructure.Migrations
                     b.ToTable("QuizQuestions");
                 });
 
+            modelBuilder.Entity("EdTech.Quiz.Domain.Entities.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("EdTech.Quiz.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -107,11 +124,24 @@ namespace EdTech.Quiz.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -156,8 +186,8 @@ namespace EdTech.Quiz.Infrastructure.Migrations
                     b.Property<int>("QuizId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Score")
-                        .HasColumnType("integer");
+                    b.Property<double>("Score")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
@@ -204,6 +234,15 @@ namespace EdTech.Quiz.Infrastructure.Migrations
                     b.Navigation("Quiz");
                 });
 
+            modelBuilder.Entity("EdTech.Quiz.Domain.Entities.User", b =>
+                {
+                    b.HasOne("EdTech.Quiz.Domain.Entities.Role", null)
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("EdTech.Quiz.Domain.Entities.UserAnswer", b =>
                 {
                     b.HasOne("EdTech.Quiz.Domain.Entities.Question", "Question")
@@ -232,7 +271,7 @@ namespace EdTech.Quiz.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("EdTech.Quiz.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Attempts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -254,6 +293,16 @@ namespace EdTech.Quiz.Infrastructure.Migrations
                     b.Navigation("Attempts");
 
                     b.Navigation("QuizQuestions");
+                });
+
+            modelBuilder.Entity("EdTech.Quiz.Domain.Entities.Role", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("EdTech.Quiz.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Attempts");
                 });
 
             modelBuilder.Entity("EdTech.Quiz.Domain.Entities.UserQuizAttempt", b =>

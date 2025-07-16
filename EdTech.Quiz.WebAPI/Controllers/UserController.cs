@@ -1,6 +1,8 @@
 using System.Net;
+using EdTech.Quiz.Application.Constants;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdTech.Quiz.WebAPI.Controllers;
@@ -11,12 +13,13 @@ public class UserController : Controller
 {
     private readonly IUserService _userService;
 
-    public UserController( IUserService userService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = UserRoles.User)]
     public async Task<IActionResult> GetUserHistory(int id)
     {
         try
@@ -35,28 +38,5 @@ public class UserController : Controller
         }
     }
 
-    // [HttpPost]
-    // public async Task<IActionResult> Create([FromBody] CreateUserDTO dto)
-    // {
-    //     try
-    //     {
-    //         int result = await _userService.CreateUserAsync(dto);
-    //         return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
-    //         {
-    //             IsSuccess = true,
-    //             Data = result,
-    //             Message = "User Created Successfully!"
-    //         });
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
-    //         {
-    //             IsSuccess = false,
-    //             Data = e.Message,
-    //             Message = "An error occurred while processing request.",
-    //         });
-    //     }
-    // }
 
 }

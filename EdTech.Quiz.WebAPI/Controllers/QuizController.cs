@@ -1,6 +1,8 @@
 using System.Net;
+using EdTech.Quiz.Application.Constants;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdTech.Quiz.WebAPI.Controllers;
@@ -9,9 +11,7 @@ namespace EdTech.Quiz.WebAPI.Controllers;
 [Route("api/[controller]/[action]")]
 public class QuizController : Controller
 {
-
     private readonly IQuizService _quizService;
-
     private readonly IAttemptService _attemptService;
     public QuizController(IQuizService quizService, IAttemptService attemptService)
     {
@@ -19,6 +19,7 @@ public class QuizController : Controller
         _attemptService = attemptService;
     }
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> Create([FromBody] CreateQuizDTO dto)
     {
         try
@@ -44,6 +45,8 @@ public class QuizController : Controller
     }
 
     [HttpGet("{id}")]
+
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
     public async Task<IActionResult> GetQuiz(int id)
     {
         try
@@ -68,6 +71,8 @@ public class QuizController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
+
     public async Task<IActionResult> GetQuizzes()
     {
         try
@@ -94,6 +99,8 @@ public class QuizController : Controller
 
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.User)]
+
     public async Task<IActionResult> StartAttempt([FromBody] StartQuizAttemptDTO dto)
     {
         try
@@ -121,6 +128,8 @@ public class QuizController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.User)]
+
     public async Task<IActionResult> SubmitAttempt(UserQuizAttemptDTO dto)
     {
         try

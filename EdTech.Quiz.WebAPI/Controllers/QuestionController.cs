@@ -1,6 +1,8 @@
 using System.Net;
+using EdTech.Quiz.Application.Constants;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdTech.Quiz.WebAPI.Controllers;
@@ -17,6 +19,7 @@ public class QuestionController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> Create([FromBody] CreateQuestionDTO dto)
     {
         try
@@ -42,6 +45,7 @@ public class QuestionController : Controller
     }
 
     [HttpGet("{QuizId}/{Count}")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
     public async Task<IActionResult> GetRandomQuestions(int QuizId, int Count)
     {
@@ -68,6 +72,7 @@ public class QuestionController : Controller
 
     }
     [HttpGet("{Count}")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
     public async Task<IActionResult> GetRandomQuestions(int Count)
     {

@@ -30,7 +30,7 @@ public class AttemptRepository : IAttemptRepository
     {
         return await _context.UserQuizAttempts.Include(u => u.User).FirstOrDefaultAsync(u => u.UserId == UserId && u.QuizId == QuizId);
     }
-  
+
     public async Task<bool> HasUserAttemptedQuizAsync(StartQuizAttemptDTO dto)
     {
         return await _context.UserQuizAttempts.AnyAsync(u => u.UserId == dto.UserId && u.QuizId == dto.QuizId);

@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<UserQuizAttempt> UserQuizAttempts => Set<UserQuizAttempt>();
     public DbSet<UserAnswer> UserAnswers => Set<UserAnswer>();
+    public DbSet<Role> Roles => Set<Role>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

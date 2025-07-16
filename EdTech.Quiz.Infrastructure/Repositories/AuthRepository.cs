@@ -28,7 +28,6 @@ public class AuthRepository : IAuthRepository
 
     public async Task<User?> GetUserByUsername(string Username)
     {
-
         return await _context.Users.FirstOrDefaultAsync(u => u.UserName.Trim() == Username.Trim());
     }
 
