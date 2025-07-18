@@ -31,9 +31,9 @@ public class QuizRepository : IQuizRepository
 
         return await _context.Questions.Where(q => QuestionIds.Contains(q.Id)).CountAsync() == QuestionIds.Count;
     }
-    public async Task<List<Quiz>> GetAllQuizzesAsync()
+    public IQueryable<Quiz> GetAllQuizzes()
     {
-        return await _context.Quizzes.Include(u => u.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).ToListAsync();
+        return  _context.Quizzes.Include(u => u.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options);
     }
 
     public async Task<Quiz?> GetQuizByIdAsync(int Id)

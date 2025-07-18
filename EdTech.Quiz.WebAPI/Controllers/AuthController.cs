@@ -32,26 +32,16 @@ public class AuthController : Controller
             ResponseDTO responseDTO = await _authService.SignIn(dto);
             if (responseDTO.IsSuccess)
             {
-                return StatusCode((int)HttpStatusCode.OK, new ApiResponse<object>()
-                {
-                    Data = responseDTO.Data,
-                    IsSuccess = true,
-                    Message = responseDTO.Message,
-                });
+                return StatusCode((int)HttpStatusCode.OK, responseDTO);
             }
             else
             {
-                return StatusCode((int)HttpStatusCode.Unauthorized, new ApiResponse<string>()
-                {
-                    Data = "SignIn failed.",
-                    IsSuccess = false,
-                    Message = responseDTO.Message,
-                });
+                return StatusCode((int)HttpStatusCode.Unauthorized, responseDTO);
             }
         }
         catch (Exception e)
         {
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
                 Data = "Something went wrong.",
                 IsSuccess = false,
@@ -72,25 +62,16 @@ public class AuthController : Controller
             ResponseDTO responseDTO = await _authService.SignUp(dto);
             if (responseDTO.IsSuccess)
             {
-                return StatusCode((int)HttpStatusCode.Created, new ApiResponse<string>()
-                {
-                    IsSuccess = true,
-                    Message = responseDTO.Message,
-                });
+                return StatusCode((int)HttpStatusCode.Created, responseDTO);
             }
             else
             {
-                return StatusCode((int)HttpStatusCode.Conflict, new ApiResponse<string>()
-                {
-                    Data = "Signup failed.",
-                    IsSuccess = false,
-                    Message = responseDTO.Message,
-                });
+                return StatusCode((int)HttpStatusCode.Conflict, responseDTO);
             }
         }
         catch (Exception e)
         {
-            return StatusCode(500, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
                 Data = "Something went wrong.",
                 IsSuccess = false,

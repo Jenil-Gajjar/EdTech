@@ -1,11 +1,12 @@
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.Helpers;
 
 namespace EdTech.Quiz.Application.Interface.Services;
 
 public interface IQuestionService
 {
     Task<int> CreateQuestionAsync(CreateQuestionDTO dto);
-    Task<List<QuestionDTO>> GetRandomQuestionsByQuizIdAsync(int QuizId, int Count);
-    Task<List<QuestionDTO>> GetRandomQuestionsAsync(int Count);
+    PaginatedResult<QuestionDTO> GetRandomQuestionsByQuizId(int QuizId, PaginationDTO dto);
+    PaginatedResult<QuestionDTO> GetRandomQuestions(PaginationDTO dto);
 
 }

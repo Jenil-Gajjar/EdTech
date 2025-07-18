@@ -29,10 +29,10 @@ public class UserController : Controller
         }
         catch (Exception e)
         {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }

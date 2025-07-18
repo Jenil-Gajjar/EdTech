@@ -24,6 +24,7 @@ public class AuthService : IAuthService
         {
             return new()
             {
+                Data = "SignIn failed.",
                 IsSuccess = false,
                 Message = "Invalid Username or Password."
             };
@@ -44,6 +45,7 @@ public class AuthService : IAuthService
         else
             return new()
             {
+                Data = "SignIn failed.",
                 IsSuccess = false,
                 Message = "Invalid Username or Password."
             };

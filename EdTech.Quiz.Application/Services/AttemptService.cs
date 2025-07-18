@@ -45,7 +45,7 @@ public class AttemptService : IAttemptService
     public async Task<QuizResultDTO> SubmitAttemptAsync(UserQuizAttemptDTO dto)
     {
 
-        List<Question> questions = await _questionRepository.GetQuestionsByQuizIdAsync(dto.QuizId) ?? throw new Exception("Quiz not found");
+        IQueryable<Question> questions = _questionRepository.GetQuestionsByQuizId(dto.QuizId) ?? throw new Exception("Quiz not found");
 
         UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new Exception("Please start quiz first");
 
@@ -54,8 +54,7 @@ public class AttemptService : IAttemptService
 
         if (!IsAttemptWithinTimeLimit(attempt)) throw new Exception("Quiz attempt exceeded 30-minute time limit.");
 
-
-        attempt.Score = CalculateScore(attempt, dto, questions);
+        attempt.Score = CalculateScore(attempt, dto, questions.ToList());
 
         await _attemptRepository.EditAttemptAsync(attempt);
 

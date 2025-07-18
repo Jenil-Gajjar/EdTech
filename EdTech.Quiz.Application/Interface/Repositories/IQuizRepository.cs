@@ -7,6 +7,6 @@ public interface IQuizRepository
     Task<bool> AreValidQuestionIds(List<int> QuestionIds);
     Task<bool> DoesQuizAlreadyExists(string quiz);
     Task<Quiz?> GetQuizByIdAsync(int Id);
-    Task<List<Quiz>> GetAllQuizzesAsync();
+    IQueryable<Quiz> GetAllQuizzes();
     Task SaveChangesAsync();
 }

@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.Helpers;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
 using EdTech.Quiz.Domain.Entities;
@@ -21,7 +23,7 @@ public class QuestionService : IQuestionService
         if (!dto.Options.Any()) throw new Exception("Options are required");
 
         if (dto.CorrectOptionIndex < 0 || dto.CorrectOptionIndex >= dto.Options.Count) throw new Exception("Invalid correct option index");
-        
+
         Question question = new()
         {
             Text = dto.Text.Trim()
@@ -42,10 +44,28 @@ public class QuestionService : IQuestionService
     }
 
 
-    public async Task<List<QuestionDTO>> GetRandomQuestionsByQuizIdAsync(int QuizId, int Count)
+    public PaginatedResult<QuestionDTO> GetRandomQuestionsByQuizId(int QuizId, PaginationDTO dto)
     {
+        var query = _questionRepository.GetQuestionsByQuizId(QuizId);
+        Expression<Func<QuestionDTO, bool>>? filter = null;
+        Expression<Func<QuestionDTO, object>>? order;
+        if (!string.IsNullOrEmpty(dto.Filter))
+        {
+            filter = u => u.Text.Trim().ToLower().Contains(dto.Filter.Trim().ToLower());
+        }
 
-        List<QuestionDTO> result = (await _questionRepository.GetQuestionsByQuizIdAsync(QuizId)).Select(u => new QuestionDTO()
+        order = dto.Order switch
+        {
+            "Text" => u => u.Text,
+            _ => u => Guid.NewGuid(),
+        };
+
+        if (dto.Count.HasValue)
+        {
+            query = query.Take((int)dto.Count);
+        }
+
+        var projectedQuery = query.Select(u => new QuestionDTO()
         {
             Id = u.Id,
             Text = u.Text,
@@ -56,14 +76,44 @@ public class QuestionService : IQuestionService
             }).ToList(),
             CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
             CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
-        }).OrderBy(x => Guid.NewGuid()).Take(Count).ToList();
+        });
 
-        return result;
+        var paginatedResult = PaginationHelper.Paginate(
+            projectedQuery,
+            dto.PageNumber,
+            dto.PageSize,
+            filter,
+            order,
+            dto.OrderByDescending
+        );
+
+        return paginatedResult;
     }
 
-    public async Task<List<QuestionDTO>> GetRandomQuestionsAsync(int Count)
+    public PaginatedResult<QuestionDTO> GetRandomQuestions(PaginationDTO dto)
     {
-        List<QuestionDTO> result = (await _questionRepository.GetQuestionsAsync()).Select(u => new QuestionDTO()
+
+        var query = _questionRepository.GetQuestions();
+
+        Expression<Func<QuestionDTO, bool>>? filter = null;
+        Expression<Func<QuestionDTO, object>>? order;
+        if (!string.IsNullOrEmpty(dto.Filter))
+        {
+            filter = u => u.Text.Trim().ToLower().Contains(dto.Filter.Trim().ToLower());
+        }
+
+        order = dto.Order switch
+        {
+            "Text" => u => u.Text,
+            _ => u => Guid.NewGuid(),
+        };
+
+        if (dto.Count.HasValue)
+        {
+            query = query.Take((int)dto.Count);
+        }
+
+        var projectedQuery = query.Select(u => new QuestionDTO()
         {
             Id = u.Id,
             Text = u.Text,
@@ -74,10 +124,18 @@ public class QuestionService : IQuestionService
             }).ToList(),
             CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
             CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
+        });
 
-        }).OrderBy(x => Guid.NewGuid()).Take(Count).ToList();
+        var paginatedResult = PaginationHelper.Paginate(
+            projectedQuery,
+            dto.PageNumber,
+            dto.PageSize,
+            filter,
+            order,
+            dto.OrderByDescending
+        );
 
-        return result;
+        return paginatedResult;
     }
 
 

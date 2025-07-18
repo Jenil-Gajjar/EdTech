@@ -1,10 +1,11 @@
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.Helpers;
 
 namespace EdTech.Quiz.Application.Interface.Services;
 public interface IQuizService
 {
     Task<int> CreateQuizAsync(CreateQuizDTO dto);
-    Task<List<QuizDTO>> GetAllQuizzesAsync();
+    PaginatedResult<QuizDTO> GetAllQuizzes(PaginationDTO dto);
     Task<QuizDTO> GetQuizByIdAsync(int Id);
 
 }

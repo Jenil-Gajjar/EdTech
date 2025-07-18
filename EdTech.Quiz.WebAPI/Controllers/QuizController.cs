@@ -1,6 +1,7 @@
 using System.Net;
 using EdTech.Quiz.Application.Constants;
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.Helpers;
 using EdTech.Quiz.Application.Interface.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ public class QuizController : Controller
         {
             int result = await _quizService.CreateQuizAsync(dto);
 
-            return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
+            return StatusCode((int)HttpStatusCode.Created, new ResponseDTO()
             {
                 Data = result,
                 IsSuccess = true,
@@ -35,7 +36,7 @@ public class QuizController : Controller
         }
         catch (Exception e)
         {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
                 IsSuccess = false,
                 Data = e.Message,
@@ -52,7 +53,7 @@ public class QuizController : Controller
         try
         {
             QuizDTO result = await _quizService.GetQuizByIdAsync(id);
-            return Ok(new ApiResponse<object>()
+            return Ok(new ResponseDTO()
             {
                 Data = result,
                 IsSuccess = true,
@@ -61,10 +62,10 @@ public class QuizController : Controller
         }
         catch (Exception e)
         {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }
@@ -73,25 +74,25 @@ public class QuizController : Controller
     [HttpGet]
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
-    public async Task<IActionResult> GetQuizzes()
+    public IActionResult GetQuizzes([FromQuery] PaginationDTO dto)
     {
         try
         {
-            List<QuizDTO> result = await _quizService.GetAllQuizzesAsync();
-            return Ok(new ApiResponse<object>()
+            PaginatedResult<QuizDTO> result = _quizService.GetAllQuizzes(dto);
+            return Ok(new ResponseDTO()
             {
                 Data = result,
                 IsSuccess = true,
-                Message = $"Total Records: {result.Count}"
+                Message = $"Data fetched successfully."
             });
         }
         catch (Exception e)
         {
 
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }
@@ -107,20 +108,20 @@ public class QuizController : Controller
         {
 
             int result = await _attemptService.StartAttemptAsync(dto);
-            return Ok(new ApiResponse<object>()
+            return Ok(new ResponseDTO()
             {
-                IsSuccess = true,
                 Data = result,
+                IsSuccess = true,
                 Message = "Quiz Started Successfully!"
             });
         }
         catch (Exception e)
         {
 
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }
@@ -135,19 +136,19 @@ public class QuizController : Controller
         try
         {
             QuizResultDTO result = await _attemptService.SubmitAttemptAsync(dto);
-            return Ok(new ApiResponse<object>()
+            return Ok(new ResponseDTO()
             {
-                IsSuccess = true,
                 Data = result,
+                IsSuccess = true,
                 Message = "Attempt Saved Successfully!"
             });
         }
         catch (Exception e)
         {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }

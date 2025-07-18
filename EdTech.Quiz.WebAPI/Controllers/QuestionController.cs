@@ -1,6 +1,7 @@
 using System.Net;
 using EdTech.Quiz.Application.Constants;
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.Helpers;
 using EdTech.Quiz.Application.Interface.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,79 +27,75 @@ public class QuestionController : Controller
         {
 
             int result = await _questionService.CreateQuestionAsync(dto);
-            return StatusCode((int)HttpStatusCode.Created, new ApiResponse<object>()
+            return StatusCode((int)HttpStatusCode.Created, new ResponseDTO()
             {
-                IsSuccess = true,
                 Data = result,
+                IsSuccess = true,
                 Message = "Question Created Successfully!"
             });
         }
         catch (Exception e)
         {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }
     }
 
-    [HttpGet("{QuizId}/{Count}")]
+    [HttpGet("{QuizId}")]
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
-    public async Task<IActionResult> GetRandomQuestions(int QuizId, int Count)
+    public IActionResult GetRandomQuestions(int QuizId, [FromQuery] PaginationDTO dto)
     {
-
         try
         {
-            List<QuestionDTO> result = await _questionService.GetRandomQuestionsByQuizIdAsync(QuizId, Count);
-            return Ok(new ApiResponse<object>()
+            PaginatedResult<QuestionDTO> result = _questionService.GetRandomQuestionsByQuizId(QuizId, dto);
+            return Ok(new ResponseDTO()
             {
-                IsSuccess = true,
                 Data = result,
-                Message = $"Total Records: {result.Count}"
+                IsSuccess = true,
+                Message = $"Data fetched successfully."
             });
         }
         catch (Exception e)
         {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }
 
     }
-    [HttpGet("{Count}")]
+    [HttpGet]
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
-    public async Task<IActionResult> GetRandomQuestions(int Count)
+    public IActionResult GetRandomQuestions([FromQuery] PaginationDTO dto)
     {
         try
         {
-            List<QuestionDTO> result = await _questionService.GetRandomQuestionsAsync(Count);
-            return Ok(new ApiResponse<object>()
+            PaginatedResult<QuestionDTO> result = _questionService.GetRandomQuestions(dto);
+            return Ok(new ResponseDTO()
             {
-                IsSuccess = true,
                 Data = result,
-                Message = $"Total Records: {result.Count}"
+                IsSuccess = true,
+                Message = $"Data fetched successfully."
             }); ;
         }
         catch (Exception e)
         {
 
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>()
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
-                IsSuccess = false,
                 Data = e.Message,
+                IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
         }
     }
-
-
-
 
 }

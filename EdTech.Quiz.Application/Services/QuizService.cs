@@ -1,4 +1,7 @@
+using System.ComponentModel;
+using System.Linq.Expressions;
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.Helpers;
 using EdTech.Quiz.Application.Interface.Repositoriess;
 using EdTech.Quiz.Application.Interface.Services;
 namespace EdTech.Quiz.Application.Services;
@@ -33,10 +36,25 @@ public class QuizService : IQuizService
         return quiz.Id;
     }
 
-    public async Task<List<QuizDTO>> GetAllQuizzesAsync()
+    public PaginatedResult<QuizDTO> GetAllQuizzes(PaginationDTO dto)
     {
 
-        return (await _quizRepository.GetAllQuizzesAsync()).Select(u => new QuizDTO
+        var query = _quizRepository.GetAllQuizzes();
+        Expression<Func<QuizDTO, bool>>? filter = null;
+        Expression<Func<QuizDTO, object>>? order = null;
+
+        if (!string.IsNullOrEmpty(dto.Filter))
+        {
+            filter = u => u.Title.Trim().ToLower().Contains(dto.Filter.Trim().ToLower());
+        }
+
+        order = dto.Order switch
+        {
+            "Title" => u => u.Title,
+            _ => u => Guid.NewGuid(),
+        };
+
+        var projectedQuery = query.Select(u => new QuizDTO
         {
             Id = u.Id,
             Title = u.Title,
@@ -52,7 +70,16 @@ public class QuizService : IQuizService
                 CorrectOption = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Text,
                 CorrectOptionId = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Id
             }).ToList()
-        }).ToList();
+        });
+        var paginatedResult = PaginationHelper.Paginate(
+            projectedQuery,
+            dto.PageNumber,
+            dto.PageSize,
+            filter,
+            order,
+            dto.OrderByDescending
+        );
+        return paginatedResult;
 
     }
 

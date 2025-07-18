@@ -6,8 +6,8 @@ public interface IQuestionRepository
 {
     Task AddQuestionAsync(Question question);
     Task<bool> DoesQuestionAlreadyExists(string question);
-    Task<List<Question>> GetQuestionsByQuizIdAsync(int QuizId);
+    IQueryable<Question> GetQuestionsByQuizId(int QuizId);
     Task SaveChangesAsync();
-    Task<List<Question>> GetQuestionsAsync();
+    IQueryable<Question> GetQuestions();
 
 }

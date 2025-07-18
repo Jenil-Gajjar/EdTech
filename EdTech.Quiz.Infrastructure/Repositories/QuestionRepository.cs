@@ -21,13 +21,12 @@ public class QuestionRepository : IQuestionRepository
     }
 
 
-    public async Task<List<Question>> GetQuestionsByQuizIdAsync(int QuizId)
+    public IQueryable<Question> GetQuestionsByQuizId(int QuizId)
     {
-        return await _context.QuizQuestions
+        return _context.QuizQuestions
                         .Where(u => u.QuizId == QuizId)
                         .Include(u => u.Question).ThenInclude(u => u.Options)
-                        .Select(u => u.Question)
-                        .ToListAsync();
+                        .Select(u => u.Question);
     }
 
     public async Task<bool> DoesQuestionAlreadyExists(string question)
@@ -35,9 +34,9 @@ public class QuestionRepository : IQuestionRepository
         return await _context.Questions.AnyAsync(u => u.Text.Trim().ToLower() == question.Trim().ToLower());
     }
 
-    public async Task<List<Question>> GetQuestionsAsync()
+    public IQueryable<Question> GetQuestions()
     {
-        return await _context.Questions.Include(u => u.Options).ToListAsync();
+        return _context.Questions.Include(u => u.Options);
     }
 
     public async Task SaveChangesAsync()

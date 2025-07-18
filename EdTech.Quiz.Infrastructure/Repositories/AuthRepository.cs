@@ -38,6 +38,7 @@ public class AuthRepository : IAuthRepository
         {
             return new()
             {
+                Data = "Signup failed.",
                 IsSuccess = false,
                 Message = "Email already exists."
             };
@@ -46,6 +47,7 @@ public class AuthRepository : IAuthRepository
         {
             return new()
             {
+                Data = "Signup failed.",
                 IsSuccess = false,
                 Message = "Username already exists."
             };
@@ -54,6 +56,7 @@ public class AuthRepository : IAuthRepository
         await _context.SaveChangesAsync();
         return new()
         {
+            Data = user.UserName,
             IsSuccess = true,
             Message = "User created successfully."
         };

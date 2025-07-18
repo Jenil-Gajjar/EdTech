@@ -43,15 +43,6 @@ var ConnectionString = builder.Configuration.GetConnectionString("MyConnectionSt
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseLazyLoadingProxies().UseNpgsql(ConnectionString));
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowInfernoApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 
 var Jwt = builder.Configuration.GetSection("Jwt");
@@ -77,6 +68,15 @@ builder.Services.AddAuthentication(options =>
 
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowInfernoApp", policy =>
+    {
+        policy.WithOrigins(Jwt["Audience"]!)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
