@@ -33,7 +33,7 @@ public class QuestionService : IQuestionService
         {
             question.Options.Add(new() { Text = optionText });
         }
-        await _questionRepository.AddQuestionAsync(question);
+        await _questionRepository.CreateQuestionAsync(question);
         await _questionRepository.SaveChangesAsync();
 
         question.CorrectOptionId = ((List<Option>)question.Options)[dto.CorrectOptionIndex].Id;
@@ -136,6 +136,12 @@ public class QuestionService : IQuestionService
         );
 
         return paginatedResult;
+    }
+
+
+    public async Task<bool> DeleteQuestionByIdAsync(int id)
+    {
+        return await _questionRepository.DeleteQuestionByIdAsync(id);
     }
 
 

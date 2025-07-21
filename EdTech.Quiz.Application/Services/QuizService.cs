@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Linq.Expressions;
 using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Helpers;
@@ -30,11 +29,12 @@ public class QuizService : IQuizService
         {
             quiz.QuizQuestions.Add(new() { QuestionId = id, Quiz = quiz });
         }
-        await _quizRepository.AddQuizAsync(quiz);
+        await _quizRepository.CreateQuizAsync(quiz);
         await _quizRepository.SaveChangesAsync();
 
         return quiz.Id;
     }
+
 
     public PaginatedResult<QuizDTO> GetAllQuizzes(PaginationDTO dto)
     {
@@ -83,9 +83,9 @@ public class QuizService : IQuizService
 
     }
 
-    public async Task<QuizDTO> GetQuizByIdAsync(int Id)
+    public async Task<QuizDTO> GetQuizByIdAsync(int id)
     {
-        Quiz result = await _quizRepository.GetQuizByIdAsync(Id) ?? throw new Exception("Quiz not found");
+        Quiz result = await _quizRepository.GetQuizByIdAsync(id) ?? throw new Exception("Quiz not found");
 
         QuizDTO quiz = new()
         {
@@ -105,6 +105,12 @@ public class QuizService : IQuizService
             }).ToList()
         };
         return quiz;
+    }
+
+
+    public async Task<bool> DeleteQuizByIdAsync(int id)
+    {
+        return await _quizRepository.DeleteQuizByIdAsync(id);
     }
 
 

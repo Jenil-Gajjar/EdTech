@@ -6,6 +6,8 @@ public interface IQuizService
 {
     Task<int> CreateQuizAsync(CreateQuizDTO dto);
     PaginatedResult<QuizDTO> GetAllQuizzes(PaginationDTO dto);
-    Task<QuizDTO> GetQuizByIdAsync(int Id);
+    Task<QuizDTO> GetQuizByIdAsync(int id);
+    Task<bool> DeleteQuizByIdAsync(int id);
+
 
 }

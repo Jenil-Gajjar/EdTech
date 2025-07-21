@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EdTech.Quiz.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]/[action]")]
+[Route("api/questions")]
 public class QuestionController : Controller
 {
     private readonly IQuestionService _questionService;
@@ -31,7 +31,7 @@ public class QuestionController : Controller
             {
                 Data = result,
                 IsSuccess = true,
-                Message = "Question Created Successfully!"
+                Message = "Question created successfully."
             });
         }
         catch (Exception e)
@@ -45,14 +45,24 @@ public class QuestionController : Controller
         }
     }
 
-    [HttpGet("{QuizId}")]
+    [HttpGet("random")]
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
-    public IActionResult GetRandomQuestions(int QuizId, [FromQuery] PaginationDTO dto)
+    public IActionResult GetRandomQuestions([FromQuery] int? quizId, [FromQuery] PaginationDTO dto)
     {
         try
         {
-            PaginatedResult<QuestionDTO> result = _questionService.GetRandomQuestionsByQuizId(QuizId, dto);
+            PaginatedResult<QuestionDTO> result;
+
+            if (quizId.HasValue)
+            {
+                result = _questionService.GetRandomQuestionsByQuizId(quizId.Value, dto);
+            }
+            else
+            {
+                result = _questionService.GetRandomQuestions(dto);
+            }
+
             return Ok(new ResponseDTO()
             {
                 Data = result,
@@ -71,24 +81,33 @@ public class QuestionController : Controller
         }
 
     }
-    [HttpGet]
-    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
-    public IActionResult GetRandomQuestions([FromQuery] PaginationDTO dto)
+    [HttpDelete("{id}")]
+    [Authorize(Roles = UserRoles.Admin)]
+
+    public async Task<IActionResult> Delete(int id)
     {
         try
         {
-            PaginatedResult<QuestionDTO> result = _questionService.GetRandomQuestions(dto);
-            return Ok(new ResponseDTO()
+            bool res = await _questionService.DeleteQuestionByIdAsync(id);
+            if (res)
             {
-                Data = result,
-                IsSuccess = true,
-                Message = $"Data fetched successfully."
-            }); ;
+                return Ok(new ResponseDTO()
+                {
+                    Data = $"Question with id {id} deleted sucessfully.",
+                    IsSuccess = true,
+                    Message = "Question deleted successfully."
+                });
+            }
+            return BadRequest(new ResponseDTO()
+            {
+                Data = $"Question with id {id} could not be deleted because it does not exist.",
+                IsSuccess = false,
+                Message = "An error occurred while processing request.",
+            });
         }
         catch (Exception e)
         {
-
             return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
             {
                 Data = e.Message,

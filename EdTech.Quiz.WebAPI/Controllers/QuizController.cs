@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EdTech.Quiz.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]/[action]")]
+[Route("api/quizzes")]
 public class QuizController : Controller
 {
     private readonly IQuizService _quizService;
@@ -31,7 +31,7 @@ public class QuizController : Controller
             {
                 Data = result,
                 IsSuccess = true,
-                Message = "Quiz Created Successfully!"
+                Message = "Quiz created successfully."
             });
         }
         catch (Exception e)
@@ -46,9 +46,8 @@ public class QuizController : Controller
     }
 
     [HttpGet("{id}")]
-
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
-    public async Task<IActionResult> GetQuiz(int id)
+    public async Task<IActionResult> Get(int id)
     {
         try
         {
@@ -57,7 +56,7 @@ public class QuizController : Controller
             {
                 Data = result,
                 IsSuccess = true,
-                Message = "Data Fetched Successfully!"
+                Message = "Data fetched successfully."
             });
         }
         catch (Exception e)
@@ -74,7 +73,7 @@ public class QuizController : Controller
     [HttpGet]
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
-    public IActionResult GetQuizzes([FromQuery] PaginationDTO dto)
+    public IActionResult GetAll([FromQuery] PaginationDTO dto)
     {
         try
         {
@@ -99,11 +98,15 @@ public class QuizController : Controller
     }
 
 
-    [HttpPost]
+    [HttpPost("{quizId}/start-attempt")]
     [Authorize(Roles = UserRoles.User)]
 
-    public async Task<IActionResult> StartAttempt([FromBody] StartQuizAttemptDTO dto)
+    public async Task<IActionResult> StartAttempt(int quizId, [FromBody] StartQuizAttemptDTO dto)
     {
+
+        if (quizId != dto.QuizId)
+            return BadRequest("Quiz ID in route does not match Quiz ID in body.");
+
         try
         {
 
@@ -112,7 +115,7 @@ public class QuizController : Controller
             {
                 Data = result,
                 IsSuccess = true,
-                Message = "Quiz Started Successfully!"
+                Message = "Quiz started successfully."
             });
         }
         catch (Exception e)
@@ -128,11 +131,14 @@ public class QuizController : Controller
 
     }
 
-    [HttpPost]
+    [HttpPost("{quizId}/submit-attempt")]
     [Authorize(Roles = UserRoles.User)]
 
-    public async Task<IActionResult> SubmitAttempt(UserQuizAttemptDTO dto)
+    public async Task<IActionResult> SubmitAttempt(int quizId, UserQuizAttemptDTO dto)
     {
+
+        if (quizId != dto.QuizId)
+            return BadRequest("Quiz ID in route does not match Quiz ID in body.");
         try
         {
             QuizResultDTO result = await _attemptService.SubmitAttemptAsync(dto);
@@ -140,7 +146,42 @@ public class QuizController : Controller
             {
                 Data = result,
                 IsSuccess = true,
-                Message = "Attempt Saved Successfully!"
+                Message = "Attempt saved successfully."
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
+            {
+                Data = e.Message,
+                IsSuccess = false,
+                Message = "An error occurred while processing request.",
+            });
+        }
+    }
+    [HttpDelete("{id}")]
+    [Authorize(Roles = UserRoles.Admin)]
+
+    public async Task<IActionResult> Delete(int id)
+    {
+
+        try
+        {
+            var res = await _quizService.DeleteQuizByIdAsync(id);
+            if (res)
+            {
+                return Ok(new ResponseDTO()
+                {
+                    Data = $"Quiz with id {id} deleted sucessfully.",
+                    IsSuccess = true,
+                    Message = "Quiz deleted successfully."
+                });
+            }
+            return BadRequest(new ResponseDTO()
+            {
+                Data = $"Quiz with id {id} could not be deleted because it does not exist.",
+                IsSuccess = false,
+                Message = "An error occurred while processing request.",
             });
         }
         catch (Exception e)

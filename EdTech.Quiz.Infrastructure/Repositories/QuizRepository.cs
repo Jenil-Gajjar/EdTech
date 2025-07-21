@@ -14,7 +14,7 @@ public class QuizRepository : IQuizRepository
     {
         _context = context;
     }
-    public async Task AddQuizAsync(Quiz quiz)
+    public async Task CreateQuizAsync(Quiz quiz)
     {
         await _context.Quizzes.AddAsync(quiz);
         await _context.SaveChangesAsync();
@@ -33,18 +33,25 @@ public class QuizRepository : IQuizRepository
     }
     public IQueryable<Quiz> GetAllQuizzes()
     {
-        return  _context.Quizzes.Include(u => u.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options);
+        return _context.Quizzes.Include(u => u.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options);
     }
 
-    public async Task<Quiz?> GetQuizByIdAsync(int Id)
+    public async Task<Quiz?> GetQuizByIdAsync(int id)
     {
-        return await _context.Quizzes.AsSplitQuery().Include(q => q.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).FirstOrDefaultAsync(q => q.Id == Id);
+        return await _context.Quizzes.AsSplitQuery().Include(q => q.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).FirstOrDefaultAsync(q => q.Id == id);
     }
 
+    public async Task<bool> DeleteQuizByIdAsync(int id)
+    {
+        Quiz? quiz = await _context.Quizzes.FirstOrDefaultAsync(u => u.Id == id);
+        if (quiz == null) return false;
 
+        _context.Quizzes.Remove(quiz);
+        await _context.SaveChangesAsync();
+        return true;
+    }
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
-
     }
 }

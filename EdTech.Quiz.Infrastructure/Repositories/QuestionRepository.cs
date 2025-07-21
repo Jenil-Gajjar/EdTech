@@ -13,13 +13,12 @@ public class QuestionRepository : IQuestionRepository
     {
         _context = context;
     }
-    public async Task AddQuestionAsync(Question question)
+    public async Task CreateQuestionAsync(Question question)
     {
         await _context.Questions.AddAsync(question);
         await _context.SaveChangesAsync();
 
     }
-
 
     public IQueryable<Question> GetQuestionsByQuizId(int QuizId)
     {
@@ -43,4 +42,13 @@ public class QuestionRepository : IQuestionRepository
     {
         await _context.SaveChangesAsync();
     }
+    public async Task<bool> DeleteQuestionByIdAsync(int id)
+    {
+        Question? question = await _context.Questions.FirstOrDefaultAsync(u => u.Id == id);
+        if (question == null) return false;
+        _context.Questions.Remove(question);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
 }

@@ -26,7 +26,7 @@ public class AuthService : IAuthService
             {
                 Data = "SignIn failed.",
                 IsSuccess = false,
-                Message = "Invalid Username or Password."
+                Message = "Invalid username or password."
             };
         }
         bool verified = BCrypt.Net.BCrypt.Verify(dto.Password.Trim(), user.Password.Trim());
@@ -38,7 +38,7 @@ public class AuthService : IAuthService
             {
                 Data = jwtToken,
                 IsSuccess = true,
-                Message = "Login Successfull."
+                Message = "Login successfull."
             };
         }
 
@@ -47,7 +47,7 @@ public class AuthService : IAuthService
             {
                 Data = "SignIn failed.",
                 IsSuccess = false,
-                Message = "Invalid Username or Password."
+                Message = "Invalid username or password."
             };
     }
 

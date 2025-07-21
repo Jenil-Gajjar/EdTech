@@ -14,13 +14,13 @@ public class AttemptRepository : IAttemptRepository
     {
         _context = context;
     }
-    public async Task<int> AddAttemptAsync(UserQuizAttempt attempt)
+    public async Task<int> CreateAttemptAsync(UserQuizAttempt attempt)
     {
         await _context.UserQuizAttempts.AddAsync(attempt);
         await _context.SaveChangesAsync();
         return attempt.Id;
     }
-    public async Task EditAttemptAsync(UserQuizAttempt attempt)
+    public async Task UpdateAttemptAsync(UserQuizAttempt attempt)
     {
         _context.UserQuizAttempts.Update(attempt);
         await _context.SaveChangesAsync();

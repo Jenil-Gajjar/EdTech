@@ -32,7 +32,7 @@ public class AttemptService : IAttemptService
             StartedAt = DateTime.UtcNow
         };
 
-        return await _attemptRepository.AddAttemptAsync(attempt);
+        return await _attemptRepository.CreateAttemptAsync(attempt);
 
     }
 
@@ -56,7 +56,7 @@ public class AttemptService : IAttemptService
 
         attempt.Score = CalculateScore(attempt, dto, questions.ToList());
 
-        await _attemptRepository.EditAttemptAsync(attempt);
+        await _attemptRepository.UpdateAttemptAsync(attempt);
 
         return new QuizResultDTO
         {

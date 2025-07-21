@@ -20,14 +20,18 @@ public class UserService : IUserService
         if (await _userRepository.DoesUserAlreadyExists(dto.Name)) throw new Exception("Name already exists");
 
         User user = new() { UserName = dto.Name.Trim() };
-        await _userRepository.AddUserAsync(user);
+        await _userRepository.CreateUserAsync(user);
         await _userRepository.SaveChangesAsync();
         return user.Id;
     }
 
+
     public async Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId)
     {
         List<UserQuizAttempt> attempts = await _userRepository.GetQuizAttemptsByIdAsync(UserId);
+
+        if (attempts == null || !attempts.Any())
+            throw new Exception("No Attempts Found!");
 
         List<QuizDetails> Quiz = attempts.Select(u => new QuizDetails()
         {
@@ -35,14 +39,17 @@ public class UserService : IUserService
             Score = u.Score,
             TimeTaken = u.CompletedAt == null ? TimeSpan.Zero : u.CompletedAt.Value - u.StartedAt
         }).ToList();
-
-        if(attempts == null || !attempts.Any()) 
-            throw new Exception("No Attempts Found!");
         return new UserQuizHistoryDTO()
         {
             Name = attempts.First().User.UserName,
             Quizzes = Quiz
         };
+    }
+
+
+    public async Task<bool> DeleteUserByIdAsync(int id)
+    {
+        return await _userRepository.DeleteUserByIdAsync(id);
     }
 
 

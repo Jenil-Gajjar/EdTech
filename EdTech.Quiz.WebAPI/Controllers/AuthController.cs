@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EdTech.Quiz.WebAPI.Controllers;
 
-[Route("api/[controller]/[action]")]
+[Route("api/auth")]
 [AllowAnonymous]
 public class AuthController : Controller
 {
@@ -18,7 +18,7 @@ public class AuthController : Controller
         _authService = authService;
     }
 
-    [HttpPost]
+    [HttpPost("sign-in")]
     public async Task<IActionResult> SignIn([FromBody] LoginDTO dto)
     {
 
@@ -50,7 +50,7 @@ public class AuthController : Controller
         }
     }
 
-    [HttpPost]
+    [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp([FromBody] RegisterDTO dto)
     {
         if (!ModelState.IsValid)
