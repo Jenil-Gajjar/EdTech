@@ -25,6 +25,11 @@ public class QuestionController : Controller
     {
         try
         {
+            if (!dto.Options.Any()) return BadRequest("Options are required.");
+
+            if (dto.Options.Count != 4) return BadRequest("The number of options must be 4.");
+
+            if (dto.CorrectOptionIndex < 0 || dto.CorrectOptionIndex >= dto.Options.Count) return BadRequest("Invalid correct option index.");
 
             int result = await _questionService.CreateQuestionAsync(dto);
             return StatusCode((int)HttpStatusCode.Created, new ResponseDTO()
@@ -45,23 +50,45 @@ public class QuestionController : Controller
         }
     }
 
-    [HttpGet("random")]
+    [HttpGet("{id}")]
     [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
 
+    public async Task<IActionResult> Get(int id)
+    {
+        try
+        {
+            QuestionDTO? question = await _questionService.GetQuestionByIdAsync(id);
+            if (question == null)
+                return BadRequest(new ResponseDTO()
+                {
+                    IsSuccess = false,
+                    Message = "Invalid Question Id."
+                });
+
+            return Ok(new ResponseDTO()
+            {
+                Data = question,
+                IsSuccess = true,
+                Message = "Data fetched successfully."
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
+            {
+                Data = e.Message,
+                IsSuccess = false,
+                Message = "An error occurred while processing request.",
+            });
+        }
+    }
+    [HttpGet("random")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
     public IActionResult GetRandomQuestions([FromQuery] int? quizId, [FromQuery] PaginationDTO dto)
     {
         try
         {
-            PaginatedResult<QuestionDTO> result;
-
-            if (quizId.HasValue)
-            {
-                result = _questionService.GetRandomQuestionsByQuizId(quizId.Value, dto);
-            }
-            else
-            {
-                result = _questionService.GetRandomQuestions(dto);
-            }
+            PaginatedResult<QuestionDTO> result = _questionService.GetRandomQuestions(quizId, dto);
 
             return Ok(new ResponseDTO()
             {
@@ -84,7 +111,6 @@ public class QuestionController : Controller
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserRoles.Admin)]
-
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -92,18 +118,16 @@ public class QuestionController : Controller
             bool res = await _questionService.DeleteQuestionByIdAsync(id);
             if (res)
             {
-                return Ok(new ResponseDTO()
+                return StatusCode((int)HttpStatusCode.OK, new ResponseDTO()
                 {
-                    Data = $"Question with id {id} deleted sucessfully.",
                     IsSuccess = true,
                     Message = "Question deleted successfully."
                 });
             }
             return BadRequest(new ResponseDTO()
             {
-                Data = $"Question with id {id} could not be deleted because it does not exist.",
                 IsSuccess = false,
-                Message = "An error occurred while processing request.",
+                Message = $"Question with id {id} could not be deleted because it does not exist.",
             });
         }
         catch (Exception e)
@@ -117,4 +141,39 @@ public class QuestionController : Controller
         }
     }
 
+    [HttpPut]
+    [Authorize(Roles = UserRoles.Admin)]
+
+    public async Task<IActionResult> Update([FromQuery] int id, [FromBody] UpdateQuestionDTO dto)
+    {
+        if (id != dto.Id)
+            return BadRequest("Id in route does not match Id in body.");
+
+        try
+        {
+            bool res = await _questionService.UpdateQuestionAsync(dto);
+            if (res)
+            {
+                return StatusCode((int)HttpStatusCode.OK, new ResponseDTO()
+                {
+                    IsSuccess = true,
+                    Message = "Question updated successfully."
+                });
+            }
+            return BadRequest(new ResponseDTO()
+            {
+                IsSuccess = false,
+                Message = $"Question with id {id} could not be updated because it does not exist.",
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
+            {
+                Data = e.Message,
+                IsSuccess = false,
+                Message = "An error occurred while processing request.",
+            });
+        }
+    }
 }

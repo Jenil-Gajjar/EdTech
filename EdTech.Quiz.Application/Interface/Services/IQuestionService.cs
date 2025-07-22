@@ -6,7 +6,10 @@ namespace EdTech.Quiz.Application.Interface.Services;
 public interface IQuestionService
 {
     Task<int> CreateQuestionAsync(CreateQuestionDTO dto);
-    PaginatedResult<QuestionDTO> GetRandomQuestionsByQuizId(int QuizId, PaginationDTO dto);
-    PaginatedResult<QuestionDTO> GetRandomQuestions(PaginationDTO dto);
+    Task<QuestionDTO?> GetQuestionByIdAsync(int id);
+
+    PaginatedResult<QuestionDTO> GetRandomQuestions(int? QuizId, PaginationDTO dto);
     Task<bool> DeleteQuestionByIdAsync(int id);
+    Task<bool> UpdateQuestionAsync(UpdateQuestionDTO dto);
+
 }

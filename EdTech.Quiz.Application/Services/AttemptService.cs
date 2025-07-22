@@ -23,7 +23,7 @@ public class AttemptService : IAttemptService
 
     public async Task<int> StartAttemptAsync(StartQuizAttemptDTO dto)
     {
-        if (await _attemptRepository.HasUserAttemptedQuizAsync(dto)) throw new Exception("User has already attempted this quiz");
+        if (await _attemptRepository.HasUserAttemptedQuizAsync(dto)) throw new Exception("User has already attempted this quiz.");
 
         UserQuizAttempt attempt = new()
         {
@@ -31,9 +31,7 @@ public class AttemptService : IAttemptService
             QuizId = dto.QuizId,
             StartedAt = DateTime.UtcNow
         };
-
         return await _attemptRepository.CreateAttemptAsync(attempt);
-
     }
 
     private bool IsAttemptWithinTimeLimit(UserQuizAttempt attempt)
@@ -45,11 +43,15 @@ public class AttemptService : IAttemptService
     public async Task<QuizResultDTO> SubmitAttemptAsync(UserQuizAttemptDTO dto)
     {
 
-        IQueryable<Question> questions = _questionRepository.GetQuestionsByQuizId(dto.QuizId) ?? throw new Exception("Quiz not found");
+        IQueryable<Question> questions = _questionRepository.GetQuestionsByQuizId(dto.QuizId) ?? throw new Exception("Quiz not found.");
 
-        UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new Exception("Please start quiz first");
+        UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new Exception("Please start quiz first.");
 
-        if (attempt.CompletedAt is not null) throw new Exception("You have already completed this quiz");
+        var ids = dto.Answers.Select(u => u.QuestionId);
+        bool areEquals = new HashSet<int>(ids).SetEquals(questions.Select(u => u.Id));
+        if (!areEquals) throw new Exception("Invalid Question Ids.");
+
+        if (attempt.CompletedAt is not null) throw new Exception("You have already completed this quiz.");
         attempt.CompletedAt = DateTime.UtcNow;
 
         if (!IsAttemptWithinTimeLimit(attempt)) throw new Exception("Quiz attempt exceeded 30-minute time limit.");

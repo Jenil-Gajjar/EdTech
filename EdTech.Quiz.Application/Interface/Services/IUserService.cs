@@ -4,8 +4,7 @@ namespace EdTech.Quiz.Application.Interface.Services;
 
 public interface IUserService
 {
-    Task<int> CreateUserAsync(CreateUserDTO dto);
     Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId);
     Task<bool> DeleteUserByIdAsync(int id);
-
+    Task<ResponseDTO> UpdateUserAsync(UpdateUserDTO dto);
 }

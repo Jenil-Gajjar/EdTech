@@ -21,10 +21,10 @@ public class JwtTokenService : IJwtTokenService
 
     public string GenerateToken(int UserId, string Role)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_key);
+        JwtSecurityTokenHandler tokenHandler = new();
+        byte[] key = Encoding.UTF8.GetBytes(_key);
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        SecurityTokenDescriptor tokenDescriptor = new()
         {
             Subject = new ClaimsIdentity(new[]
                 {
@@ -37,7 +37,7 @@ public class JwtTokenService : IJwtTokenService
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
         };
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
+        SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
 }

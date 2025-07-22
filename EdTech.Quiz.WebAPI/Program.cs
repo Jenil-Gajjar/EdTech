@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>
 {
-    var jwtSecurityScheme = new OpenApiSecurityScheme
+    OpenApiSecurityScheme jwtSecurityScheme = new()
     {
         BearerFormat = "JWT",
         Name = "JWT Authetication",
@@ -39,14 +39,13 @@ builder.Services.AddSwaggerGen(setup =>
     });
 });
 
-var ConnectionString = builder.Configuration.GetConnectionString("MyConnectionString");
+string? ConnectionString = builder.Configuration.GetConnectionString("MyConnectionString");
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseLazyLoadingProxies().UseNpgsql(ConnectionString));
 
 
-
-var Jwt = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(Jwt["Key"]!);
+IConfigurationSection Jwt = builder.Configuration.GetSection("Jwt");
+byte[] key = Encoding.UTF8.GetBytes(Jwt["Key"]!);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -89,7 +88,7 @@ builder.Services.AddScoped<IAttemptService, AttemptService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

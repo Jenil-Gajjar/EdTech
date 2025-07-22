@@ -45,22 +45,52 @@ public class UserController : Controller
     {
         try
         {
-            var res = await _userService.DeleteUserByIdAsync(id);
+            bool res = await _userService.DeleteUserByIdAsync(id);
             if (res)
             {
-                return Ok(new ResponseDTO()
+                return StatusCode((int)HttpStatusCode.OK, new ResponseDTO()
                 {
-                    Data = $"User with id {id} deleted sucessfully.",
                     IsSuccess = true,
                     Message = "User deleted successfully."
                 });
             }
             return BadRequest(new ResponseDTO()
             {
-                Data = $"User with id {id} could not be deleted because it does not exist.",
+                Message = $"User with id {id} could not be deleted because it does not exist.",
+                IsSuccess = false,
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
+            {
+                Data = e.Message,
                 IsSuccess = false,
                 Message = "An error occurred while processing request.",
             });
+        }
+    }
+
+    [HttpPut]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.User}")]
+
+    public async Task<IActionResult> Update([FromQuery] int id, [FromBody] UpdateUserDTO dto)
+    {
+
+        if (!ModelState.IsValid) return BadRequest("Invalid Data");
+
+        if (id != dto.Id) return BadRequest("Id in route does not match Id in body.");
+
+        try
+        {
+            ResponseDTO responseDTO = await _userService.UpdateUserAsync(dto);
+
+            if (responseDTO.IsSuccess)
+                return StatusCode((int)HttpStatusCode.OK, responseDTO);
+
+            else
+                return StatusCode((int)HttpStatusCode.Conflict, responseDTO);
+
         }
         catch (Exception e)
         {

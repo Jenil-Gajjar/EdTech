@@ -1,3 +1,5 @@
+using System.Net.Quic;
+using EdTech.Quiz.Application.DTOs;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Infrastructure.Data;
@@ -28,9 +30,9 @@ public class QuestionRepository : IQuestionRepository
                         .Select(u => u.Question);
     }
 
-    public async Task<bool> DoesQuestionAlreadyExists(string question)
+    public async Task<bool> DoesQuestionAlreadyExists(string question, int id = 0)
     {
-        return await _context.Questions.AnyAsync(u => u.Text.Trim().ToLower() == question.Trim().ToLower());
+        return await _context.Questions.AnyAsync(u => (id == 0 || u.Id != id) && u.Text.Trim().ToLower() == question.Trim().ToLower());
     }
 
     public IQueryable<Question> GetQuestions()
@@ -51,4 +53,46 @@ public class QuestionRepository : IQuestionRepository
         return true;
     }
 
+    public async Task<bool> UpdateQuestionAsync(UpdateQuestionDTO dto)
+    {
+        Question? question = await _context.Questions.FirstOrDefaultAsync(u => u.Id == dto.Id);
+        if (question == null) return false;
+
+        if (await DoesQuestionAlreadyExists(dto.Text, dto.Id)) throw new Exception("Question already exists.");
+
+        IEnumerable<int> dboptionsId = question.Options.Select(u => u.Id);
+        IEnumerable<int> optionsId = dto.Options.Select(u => u.Id);
+
+        bool areEquals = new HashSet<int>(dboptionsId).SetEquals(optionsId);
+        if (!areEquals) throw new Exception("Invalid option ids.");
+
+        if (!dboptionsId.Contains(dto.CorrectOptionId)) throw new Exception("Invalid correct option id.");
+
+        question.Text = dto.Text.Trim();
+        foreach (Option dboption in question.Options)
+        {
+            OptionDTO option = dto.Options.First(u => u.Id == dboption.Id);
+            dboption.Text = option.Text.Trim();
+        }
+        question.CorrectOptionId = dto.CorrectOptionId;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<QuestionDTO?> GetQuestionByIdAsync(int id)
+    {
+        return await _context.Questions.Where(u => u.Id == id).Select(u => new QuestionDTO()
+        {
+
+            Id = u.Id,
+            Text = u.Text,
+            Options = u.Options.Select(u => new OptionDTO()
+            {
+                Id = u.Id,
+                Text = u.Text,
+            }).ToList(),
+            CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
+            CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
+        }).FirstOrDefaultAsync();
+    }
 }

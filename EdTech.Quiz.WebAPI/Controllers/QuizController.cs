@@ -51,10 +51,18 @@ public class QuizController : Controller
     {
         try
         {
-            QuizDTO result = await _quizService.GetQuizByIdAsync(id);
+            QuizDTO? quiz = await _quizService.GetQuizByIdAsync(id);
+
+            if (quiz == null)
+                return BadRequest(new ResponseDTO()
+                {
+                    IsSuccess = false,
+                    Message = "Invalid Quiz Id."
+                });
+
             return Ok(new ResponseDTO()
             {
-                Data = result,
+                Data = quiz,
                 IsSuccess = true,
                 Message = "Data fetched successfully."
             });
@@ -96,7 +104,6 @@ public class QuizController : Controller
             });
         }
     }
-
 
     [HttpPost("{quizId}/start-attempt")]
     [Authorize(Roles = UserRoles.User)]
@@ -167,21 +174,53 @@ public class QuizController : Controller
 
         try
         {
-            var res = await _quizService.DeleteQuizByIdAsync(id);
+            bool res = await _quizService.DeleteQuizByIdAsync(id);
             if (res)
             {
-                return Ok(new ResponseDTO()
+                return StatusCode((int)HttpStatusCode.OK, new ResponseDTO()
                 {
-                    Data = $"Quiz with id {id} deleted sucessfully.",
                     IsSuccess = true,
                     Message = "Quiz deleted successfully."
                 });
             }
             return BadRequest(new ResponseDTO()
             {
-                Data = $"Quiz with id {id} could not be deleted because it does not exist.",
+                IsSuccess = false,
+                Message = $"Quiz with id {id} could not be deleted because it does not exist."
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
+            {
+                Data = e.Message,
                 IsSuccess = false,
                 Message = "An error occurred while processing request.",
+            });
+        }
+    }
+    [HttpPut]
+    [Authorize(Roles = UserRoles.Admin)]
+
+    public async Task<IActionResult> Update([FromQuery] int id, [FromBody] UpdateQuizDTO dto)
+    {
+        if (id != dto.Id)
+            return BadRequest("Id in route does not match Id in body.");
+        try
+        {
+            bool res = await _quizService.UpdateQuizAsync(dto);
+            if (res)
+            {
+                return StatusCode((int)HttpStatusCode.OK, new ResponseDTO()
+                {
+                    IsSuccess = true,
+                    Message = "Quiz updated successfully."
+                });
+            }
+            return BadRequest(new ResponseDTO()
+            {
+                IsSuccess = false,
+                Message = $"Question with id {id} could not be update because it does not exist."
             });
         }
         catch (Exception e)

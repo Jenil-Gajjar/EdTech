@@ -58,7 +58,7 @@ public class AuthService : IAuthService
         User user = new()
         {
             UserName = dto.Username.Trim(),
-            Email = dto.Email.Trim(),
+            Email = dto.Email.Trim().ToLower(),
             Password = passwordHash.Trim(),
             RoleId = (int)RoleEnum.User
         };

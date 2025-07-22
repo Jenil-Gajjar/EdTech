@@ -17,9 +17,9 @@ public class QuizService : IQuizService
 
     public async Task<int> CreateQuizAsync(CreateQuizDTO dto)
     {
-        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new Exception("Quiz already exits");
+        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new Exception("Quiz already exits.");
 
-        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid question ids");
+        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid question ids.");
 
         Quiz quiz = new()
         {
@@ -39,7 +39,7 @@ public class QuizService : IQuizService
     public PaginatedResult<QuizDTO> GetAllQuizzes(PaginationDTO dto)
     {
 
-        var query = _quizRepository.GetAllQuizzes();
+        IQueryable<Quiz> query = _quizRepository.GetAllQuizzes();
         Expression<Func<QuizDTO, bool>>? filter = null;
         Expression<Func<QuizDTO, object>>? order = null;
 
@@ -54,7 +54,7 @@ public class QuizService : IQuizService
             _ => u => Guid.NewGuid(),
         };
 
-        var projectedQuery = query.Select(u => new QuizDTO
+        IQueryable<QuizDTO> projectedQuery = query.Select(u => new QuizDTO
         {
             Id = u.Id,
             Title = u.Title,
@@ -71,7 +71,7 @@ public class QuizService : IQuizService
                 CorrectOptionId = u.Question.Options.First(o => o.Id == u.Question.CorrectOptionId).Id
             }).ToList()
         });
-        var paginatedResult = PaginationHelper.Paginate(
+        PaginatedResult<QuizDTO> paginatedResult = PaginationHelper.Paginate(
             projectedQuery,
             dto.PageNumber,
             dto.PageSize,
@@ -83,9 +83,10 @@ public class QuizService : IQuizService
 
     }
 
-    public async Task<QuizDTO> GetQuizByIdAsync(int id)
+    public async Task<QuizDTO?> GetQuizByIdAsync(int id)
     {
-        Quiz result = await _quizRepository.GetQuizByIdAsync(id) ?? throw new Exception("Quiz not found");
+        Quiz? result = await _quizRepository.GetQuizByIdAsync(id);
+        if (result == null) return null;
 
         QuizDTO quiz = new()
         {
@@ -113,6 +114,9 @@ public class QuizService : IQuizService
         return await _quizRepository.DeleteQuizByIdAsync(id);
     }
 
-
+    public async Task<bool> UpdateQuizAsync(UpdateQuizDTO dto)
+    {
+        return await _quizRepository.UpdateQuizAsync(dto);
+    }
 
 }

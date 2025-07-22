@@ -18,11 +18,7 @@ public class QuestionService : IQuestionService
     }
     public async Task<int> CreateQuestionAsync(CreateQuestionDTO dto)
     {
-        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question already exists");
-
-        if (!dto.Options.Any()) throw new Exception("Options are required");
-
-        if (dto.CorrectOptionIndex < 0 || dto.CorrectOptionIndex >= dto.Options.Count) throw new Exception("Invalid correct option index");
+        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question already exists.");
 
         Question question = new()
         {
@@ -43,57 +39,14 @@ public class QuestionService : IQuestionService
 
     }
 
-
-    public PaginatedResult<QuestionDTO> GetRandomQuestionsByQuizId(int QuizId, PaginationDTO dto)
+    public async Task<QuestionDTO?> GetQuestionByIdAsync(int id)
     {
-        var query = _questionRepository.GetQuestionsByQuizId(QuizId);
-        Expression<Func<QuestionDTO, bool>>? filter = null;
-        Expression<Func<QuestionDTO, object>>? order;
-        if (!string.IsNullOrEmpty(dto.Filter))
-        {
-            filter = u => u.Text.Trim().ToLower().Contains(dto.Filter.Trim().ToLower());
-        }
-
-        order = dto.Order switch
-        {
-            "Text" => u => u.Text,
-            _ => u => Guid.NewGuid(),
-        };
-
-        if (dto.Count.HasValue)
-        {
-            query = query.Take((int)dto.Count);
-        }
-
-        var projectedQuery = query.Select(u => new QuestionDTO()
-        {
-            Id = u.Id,
-            Text = u.Text,
-            Options = u.Options.Select(x => new OptionDTO()
-            {
-                Id = x.Id,
-                Text = x.Text
-            }).ToList(),
-            CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
-            CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
-        });
-
-        var paginatedResult = PaginationHelper.Paginate(
-            projectedQuery,
-            dto.PageNumber,
-            dto.PageSize,
-            filter,
-            order,
-            dto.OrderByDescending
-        );
-
-        return paginatedResult;
+        return await _questionRepository.GetQuestionByIdAsync(id);
     }
-
-    public PaginatedResult<QuestionDTO> GetRandomQuestions(PaginationDTO dto)
+    public PaginatedResult<QuestionDTO> GetRandomQuestions(int? quizId, PaginationDTO dto)
     {
 
-        var query = _questionRepository.GetQuestions();
+        IQueryable<Question> query = quizId.HasValue ? _questionRepository.GetQuestionsByQuizId(quizId.Value) : _questionRepository.GetQuestions();
 
         Expression<Func<QuestionDTO, bool>>? filter = null;
         Expression<Func<QuestionDTO, object>>? order;
@@ -113,7 +66,7 @@ public class QuestionService : IQuestionService
             query = query.Take((int)dto.Count);
         }
 
-        var projectedQuery = query.Select(u => new QuestionDTO()
+        IQueryable<QuestionDTO> projectedQuery = query.Select(u => new QuestionDTO()
         {
             Id = u.Id,
             Text = u.Text,
@@ -126,7 +79,7 @@ public class QuestionService : IQuestionService
             CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
         });
 
-        var paginatedResult = PaginationHelper.Paginate(
+        PaginatedResult<QuestionDTO> paginatedResult = PaginationHelper.Paginate(
             projectedQuery,
             dto.PageNumber,
             dto.PageSize,
@@ -137,12 +90,15 @@ public class QuestionService : IQuestionService
 
         return paginatedResult;
     }
-
 
     public async Task<bool> DeleteQuestionByIdAsync(int id)
     {
         return await _questionRepository.DeleteQuestionByIdAsync(id);
     }
 
+    public async Task<bool> UpdateQuestionAsync(UpdateQuestionDTO dto)
+    {
+        return await _questionRepository.UpdateQuestionAsync(dto);
+    }
 
 }

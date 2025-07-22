@@ -33,7 +33,7 @@ public class PaginationHelper
             source = orderByDescending ? source.OrderByDescending(order) : source.OrderBy(order);
         }
 
-        var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        List<T> items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
         return new()
         {

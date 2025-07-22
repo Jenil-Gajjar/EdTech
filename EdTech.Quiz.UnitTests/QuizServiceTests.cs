@@ -21,14 +21,14 @@ public class QuizServiceTests
             }
         };
 
-        var attempt = new UserQuizAttempt();
-        var questions = new List<Question>
+        UserQuizAttempt? attempt = new();
+        List<Question>? questions = new()
         {
             new(){Id=2,CorrectOptionId=8},
             new(){Id=3,CorrectOptionId = 11}
         };
 
-        var result = AttemptService.CalculateScore(attempt, dto, questions);
+        double result = AttemptService.CalculateScore(attempt, dto, questions);
 
         Assert.Equal(100, result);
     }

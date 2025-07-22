@@ -15,23 +15,12 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<int> CreateUserAsync(CreateUserDTO dto)
-    {
-        if (await _userRepository.DoesUserAlreadyExists(dto.Name)) throw new Exception("Name already exists");
-
-        User user = new() { UserName = dto.Name.Trim() };
-        await _userRepository.CreateUserAsync(user);
-        await _userRepository.SaveChangesAsync();
-        return user.Id;
-    }
-
-
     public async Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId)
     {
         List<UserQuizAttempt> attempts = await _userRepository.GetQuizAttemptsByIdAsync(UserId);
 
         if (attempts == null || !attempts.Any())
-            throw new Exception("No Attempts Found!");
+            throw new Exception("No attempts found.");
 
         List<QuizDetails> Quiz = attempts.Select(u => new QuizDetails()
         {
@@ -52,5 +41,10 @@ public class UserService : IUserService
         return await _userRepository.DeleteUserByIdAsync(id);
     }
 
+    public async Task<ResponseDTO> UpdateUserAsync(UpdateUserDTO dto)
+    {
+        dto.Password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
+        return await _userRepository.UpdateUserAsync(dto);
+    }
 }
