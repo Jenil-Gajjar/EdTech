@@ -1,5 +1,6 @@
-using System.Net.Quic;
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Infrastructure.Data;
@@ -46,8 +47,7 @@ public class QuestionRepository : IQuestionRepository
     }
     public async Task<bool> DeleteQuestionByIdAsync(int id)
     {
-        Question? question = await _context.Questions.FirstOrDefaultAsync(u => u.Id == id);
-        if (question == null) return false;
+        Question question = await _context.Questions.FirstOrDefaultAsync(u => u.Id == id) ?? throw new QuestionNotFoundException();
         _context.Questions.Remove(question);
         await _context.SaveChangesAsync();
         return true;
@@ -55,18 +55,17 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<bool> UpdateQuestionAsync(UpdateQuestionDTO dto)
     {
-        Question? question = await _context.Questions.FirstOrDefaultAsync(u => u.Id == dto.Id);
-        if (question == null) return false;
+        Question question = await _context.Questions.FirstOrDefaultAsync(u => u.Id == dto.Id) ?? throw new QuestionNotFoundException();
 
-        if (await DoesQuestionAlreadyExists(dto.Text, dto.Id)) throw new Exception("Question already exists.");
+        if (await DoesQuestionAlreadyExists(dto.Text, dto.Id)) throw new QuestionAlreadyExistsException();
 
         IEnumerable<int> dboptionsId = question.Options.Select(u => u.Id);
         IEnumerable<int> optionsId = dto.Options.Select(u => u.Id);
 
         bool areEquals = new HashSet<int>(dboptionsId).SetEquals(optionsId);
-        if (!areEquals) throw new Exception("Invalid option ids.");
+        if (!areEquals) throw new OptionInvalidIdsException();
 
-        if (!dboptionsId.Contains(dto.CorrectOptionId)) throw new Exception("Invalid correct option id.");
+        if (!dboptionsId.Contains(dto.CorrectOptionId)) throw new OptionCorrectIdInvalidException();
 
         question.Text = dto.Text.Trim();
         foreach (Option dboption in question.Options)
@@ -79,7 +78,7 @@ public class QuestionRepository : IQuestionRepository
         return true;
     }
 
-    public async Task<QuestionDTO?> GetQuestionByIdAsync(int id)
+    public async Task<QuestionDTO> GetQuestionByIdAsync(int id)
     {
         return await _context.Questions.Where(u => u.Id == id).Select(u => new QuestionDTO()
         {
@@ -93,6 +92,6 @@ public class QuestionRepository : IQuestionRepository
             }).ToList(),
             CorrectOption = u.Options.First(o => o.Id == u.CorrectOptionId).Text,
             CorrectOptionId = u.Options.First(o => o.Id == u.CorrectOptionId).Id
-        }).FirstOrDefaultAsync();
+        }).FirstOrDefaultAsync() ?? throw new QuestionNotFoundException();
     }
 }

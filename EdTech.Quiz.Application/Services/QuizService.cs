@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Helpers;
 using EdTech.Quiz.Application.Interface.Repositoriess;
 using EdTech.Quiz.Application.Interface.Services;
@@ -17,9 +19,9 @@ public class QuizService : IQuizService
 
     public async Task<int> CreateQuizAsync(CreateQuizDTO dto)
     {
-        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new Exception("Quiz already exits.");
+        if (await _quizRepository.DoesQuizAlreadyExists(dto.Title)) throw new QuizAlreadyExistsException();
 
-        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid question ids.");
+        if (!await _quizRepository.AreValidQuestionIds(dto.QuestionIds)) throw new QuestionInvalidIdsException();
 
         Quiz quiz = new()
         {
@@ -83,10 +85,9 @@ public class QuizService : IQuizService
 
     }
 
-    public async Task<QuizDTO?> GetQuizByIdAsync(int id)
+    public async Task<QuizDTO> GetQuizByIdAsync(int id)
     {
-        Quiz? result = await _quizRepository.GetQuizByIdAsync(id);
-        if (result == null) return null;
+        Quiz result = await _quizRepository.GetQuizByIdAsync(id);
 
         QuizDTO quiz = new()
         {

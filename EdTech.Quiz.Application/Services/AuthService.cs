@@ -1,4 +1,6 @@
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
 using EdTech.Quiz.Domain.Entities;
@@ -18,37 +20,20 @@ public class AuthService : IAuthService
 
     public async Task<ResponseDTO> SignIn(LoginDTO dto)
     {
-        User? user = await _authRepository.GetUserByUsername(dto.Username.Trim());
+        User? user = await _authRepository.GetUserByUsername(dto.Username.Trim()) ?? throw new AuthenticationFailedException();
 
-        if (user == null)
-        {
-            return new()
-            {
-                Data = "SignIn failed.",
-                IsSuccess = false,
-                Message = "Invalid username or password."
-            };
-        }
         bool verified = BCrypt.Net.BCrypt.Verify(dto.Password.Trim(), user.Password.Trim());
 
-        if (verified)
-        {
-            string jwtToken = _jwtTokenService.GenerateToken(user.Id, user.Role.RoleName);
-            return new()
-            {
-                Data = jwtToken,
-                IsSuccess = true,
-                Message = "Login successfull."
-            };
-        }
+        if (!verified) throw new AuthenticationFailedException();
 
-        else
-            return new()
-            {
-                Data = "SignIn failed.",
-                IsSuccess = false,
-                Message = "Invalid username or password."
-            };
+        string jwtToken = _jwtTokenService.GenerateToken(user.Id, user.Role.RoleName);
+        return new()
+        {
+            Data = jwtToken,
+            IsSuccess = true,
+            Message = "Login successfull."
+        };
+
     }
 
     public async Task<ResponseDTO> SignUp(RegisterDTO dto)

@@ -1,11 +1,12 @@
-using System.Net;
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
 using EdTech.Quiz.Application.Interface.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdTech.Quiz.WebAPI.Controllers;
 
+[ApiController]
 [Route("api/auth")]
 [AllowAnonymous]
 public class AuthController : Controller
@@ -19,64 +20,34 @@ public class AuthController : Controller
     }
 
     [HttpPost("sign-in")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
     public async Task<IActionResult> SignIn([FromBody] LoginDTO dto)
     {
+        ResponseDTO responseDTO = await _authService.SignIn(dto);
+        if (responseDTO.IsSuccess)
+            return Ok(responseDTO);
+        else
+            return Unauthorized(responseDTO);
 
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Invalid Data");
-        }
-
-        try
-        {
-            ResponseDTO responseDTO = await _authService.SignIn(dto);
-            if (responseDTO.IsSuccess)
-            {
-                return StatusCode((int)HttpStatusCode.OK, responseDTO);
-            }
-            else
-            {
-                return StatusCode((int)HttpStatusCode.Unauthorized, responseDTO);
-            }
-        }
-        catch (Exception e)
-        {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
-            {
-                Data = "Something went wrong.",
-                IsSuccess = false,
-                Message = e.Message,
-            });
-        }
     }
 
     [HttpPost("sign-up")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SignUp([FromBody] RegisterDTO dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Invalid Data");
-        }
-        try
-        {
-            ResponseDTO responseDTO = await _authService.SignUp(dto);
-            if (responseDTO.IsSuccess)
-            {
-                return StatusCode((int)HttpStatusCode.Created, responseDTO);
-            }
-            else
-            {
-                return StatusCode((int)HttpStatusCode.Conflict, responseDTO);
-            }
-        }
-        catch (Exception e)
-        {
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ResponseDTO()
-            {
-                Data = "Something went wrong.",
-                IsSuccess = false,
-                Message = e.Message,
-            });
-        }
+
+        ResponseDTO responseDTO = await _authService.SignUp(dto);
+        if (responseDTO.IsSuccess)
+            return StatusCode(StatusCodes.Status201Created, responseDTO);
+        else
+            return Conflict(responseDTO);
+
     }
 }

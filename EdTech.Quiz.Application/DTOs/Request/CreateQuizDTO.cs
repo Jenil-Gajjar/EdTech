@@ -1,8 +1,6 @@
-namespace EdTech.Quiz.Application.DTOs;
-
-public class UpdateQuizDTO
+namespace EdTech.Quiz.Application.DTOs.Request;
+public class CreateQuizDTO
 {
-    public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public List<int> QuestionIds { get; set; } = new();
 }

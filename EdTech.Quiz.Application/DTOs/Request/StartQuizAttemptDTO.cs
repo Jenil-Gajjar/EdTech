@@ -1,5 +1,4 @@
-namespace EdTech.Quiz.Application.DTOs;
-
+namespace EdTech.Quiz.Application.DTOs.Request;
 public class StartQuizAttemptDTO
 {
     public int QuizId { get; set; }

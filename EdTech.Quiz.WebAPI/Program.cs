@@ -1,17 +1,32 @@
 using System.Text;
+using System.Threading.RateLimiting;
+
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
+using Serilog;
+
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Repositoriess;
 using EdTech.Quiz.Application.Interface.Services;
 using EdTech.Quiz.Application.Services;
 using EdTech.Quiz.Infrastructure.Data;
 using EdTech.Quiz.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using EdTech.Quiz.WebAPI.Middleware;
+using EdTech.Quiz.Application.Validators;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+
+builder.Host.UseSerilog();
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginDtoValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>
@@ -66,7 +81,22 @@ builder.Services.AddAuthentication(options =>
     };
 
 });
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString() ?? "anonymous",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                AutoReplenishment = true,
+                Window = TimeSpan.FromSeconds(10),
+                QueueLimit = 2,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            }));
+});
 
+builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowInfernoApp", policy =>
@@ -90,7 +120,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 WebApplication? app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -100,12 +129,14 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
-
-app.UseRouting();
-app.UseCors("AllowInfernoApp");
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseRateLimiter();
+app.UseRouting();
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("AllowInfernoApp");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

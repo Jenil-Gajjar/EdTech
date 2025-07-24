@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Helpers;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
@@ -18,7 +20,7 @@ public class QuestionService : IQuestionService
     }
     public async Task<int> CreateQuestionAsync(CreateQuestionDTO dto)
     {
-        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new Exception("Question already exists.");
+        if (await _questionRepository.DoesQuestionAlreadyExists(dto.Text)) throw new QuestionAlreadyExistsException();
 
         Question question = new()
         {
@@ -39,7 +41,7 @@ public class QuestionService : IQuestionService
 
     }
 
-    public async Task<QuestionDTO?> GetQuestionByIdAsync(int id)
+    public async Task<QuestionDTO> GetQuestionByIdAsync(int id)
     {
         return await _questionRepository.GetQuestionByIdAsync(id);
     }
@@ -47,6 +49,12 @@ public class QuestionService : IQuestionService
     {
 
         IQueryable<Question> query = quizId.HasValue ? _questionRepository.GetQuestionsByQuizId(quizId.Value) : _questionRepository.GetQuestions();
+
+        if (query == null || !query.Any())
+        {
+            if (quizId.HasValue) throw new QuizInvalidIdException();
+            else throw new RecordsNotFoundException();
+        }
 
         Expression<Func<QuestionDTO, bool>>? filter = null;
         Expression<Func<QuestionDTO, object>>? order;

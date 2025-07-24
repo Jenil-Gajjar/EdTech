@@ -1,4 +1,5 @@
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
 using EdTech.Quiz.Domain.Entities;
 
 namespace EdTech.Quiz.Application.Interface.Repositories;
@@ -12,5 +13,5 @@ public interface IQuestionRepository
     IQueryable<Question> GetQuestions();
     Task<bool> DeleteQuestionByIdAsync(int id);
     Task<bool> UpdateQuestionAsync(UpdateQuestionDTO dto);
-    Task<QuestionDTO?> GetQuestionByIdAsync(int id);
+    Task<QuestionDTO> GetQuestionByIdAsync(int id);
 }

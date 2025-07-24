@@ -1,5 +1,4 @@
-namespace EdTech.Quiz.Application.DTOs;
-
+namespace EdTech.Quiz.Application.DTOs.Request;
 public class PaginationDTO
 {
     public int PageNumber { get; set; } = 1;

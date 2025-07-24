@@ -1,6 +1,4 @@
-
-namespace EdTech.Quiz.Application.DTOs;
-
+namespace EdTech.Quiz.Application.DTOs.Request;
 public class CreateQuestionDTO
 {
     public string Text { get; set; } = string.Empty;

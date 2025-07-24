@@ -1,4 +1,5 @@
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Interface.Repositoriess;
 using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Infrastructure.Data;
@@ -37,15 +38,14 @@ public class QuizRepository : IQuizRepository
         return _context.Quizzes.Include(u => u.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options);
     }
 
-    public async Task<Quiz?> GetQuizByIdAsync(int id)
+    public async Task<Quiz> GetQuizByIdAsync(int id)
     {
-        return await _context.Quizzes.AsSplitQuery().Include(q => q.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).FirstOrDefaultAsync(q => q.Id == id);
+        return await _context.Quizzes.AsSplitQuery().Include(q => q.QuizQuestions).ThenInclude(qq => qq.Question).ThenInclude(q => q.Options).FirstOrDefaultAsync(q => q.Id == id) ?? throw new QuizNotFoundException();
     }
 
     public async Task<bool> DeleteQuizByIdAsync(int id)
     {
-        Quiz? quiz = await _context.Quizzes.FirstOrDefaultAsync(u => u.Id == id);
-        if (quiz == null) return false;
+        Quiz quiz = await _context.Quizzes.FirstOrDefaultAsync(u => u.Id == id) ?? throw new QuizNotFoundException();
 
         _context.Quizzes.Remove(quiz);
         await _context.SaveChangesAsync();
@@ -58,12 +58,11 @@ public class QuizRepository : IQuizRepository
 
     public async Task<bool> UpdateQuizAsync(UpdateQuizDTO dto)
     {
-        Quiz? quiz = await _context.Quizzes.Include(u => u.QuizQuestions).FirstOrDefaultAsync(u => u.Id == dto.Id);
-        if (quiz == null) return false;
+        Quiz quiz = await _context.Quizzes.Include(u => u.QuizQuestions).FirstOrDefaultAsync(u => u.Id == dto.Id) ?? throw new QuizNotFoundException();
 
-        if (await DoesQuizAlreadyExists(dto.Title, dto.Id)) throw new Exception("Quiz already exists.");
+        if (await DoesQuizAlreadyExists(dto.Title, dto.Id)) throw new QuizAlreadyExistsException();
 
-        if (!await AreValidQuestionIds(dto.QuestionIds)) throw new Exception("Invalid question ids.");
+        if (!await AreValidQuestionIds(dto.QuestionIds)) throw new QuestionInvalidIdsException();
 
         quiz.Title = dto.Title.Trim();
 

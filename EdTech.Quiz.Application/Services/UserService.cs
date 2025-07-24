@@ -1,8 +1,11 @@
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
+using EdTech.Quiz.Application.Response.DTOs;
 using EdTech.Quiz.Domain.Entities;
-using static EdTech.Quiz.Application.DTOs.UserQuizHistoryDTO;
+using static EdTech.Quiz.Application.Response.DTOs.UserQuizHistoryDTO;
 
 namespace EdTech.Quiz.Application.Services;
 
@@ -15,12 +18,12 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<UserQuizHistoryDTO?> GetUserQuizHistoryAsync(int UserId)
+    public async Task<UserQuizHistoryDTO> GetUserQuizHistoryAsync(int UserId)
     {
         List<UserQuizAttempt> attempts = await _userRepository.GetQuizAttemptsByIdAsync(UserId);
 
         if (attempts == null || !attempts.Any())
-            throw new Exception("No attempts found.");
+            throw new AttemptsNotFoundException();
 
         List<QuizDetails> Quiz = attempts.Select(u => new QuizDetails()
         {

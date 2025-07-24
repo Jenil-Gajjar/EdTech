@@ -1,4 +1,6 @@
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Infrastructure.Data;
@@ -29,8 +31,7 @@ public class UserRepository : IUserRepository
     }
     public async Task<bool> DeleteUserByIdAsync(int id)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-        if (user == null) return false;
+        User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
@@ -38,31 +39,11 @@ public class UserRepository : IUserRepository
     }
     public async Task<ResponseDTO> UpdateUserAsync(UpdateUserDTO userDTO)
     {
-        if (await DoesNameAlreadyExists(userDTO.Username, userDTO.Id))
-        {
-            return new()
-            {
-                IsSuccess = false,
-                Message = "Username already exists."
-            };
-        }
-        if (await DoesEmailAlreadyExists(userDTO.Email, userDTO.Id))
-        {
-            return new()
-            {
-                IsSuccess = false,
-                Message = "Email already exists."
-            };
-        }
+        if (await DoesNameAlreadyExists(userDTO.Username, userDTO.Id)) throw new UsernameAlreadyExistsException();
 
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userDTO.Id);
+        if (await DoesEmailAlreadyExists(userDTO.Email, userDTO.Id)) throw new EmailAlreadyExistsException();
 
-        if (user == null)
-            return new()
-            {
-                IsSuccess = false,
-                Message = "User not found."
-            };
+        User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userDTO.Id) ?? throw new UserNotFoundException();
 
         user.UserName = userDTO.Username;
         user.Email = userDTO.Email;

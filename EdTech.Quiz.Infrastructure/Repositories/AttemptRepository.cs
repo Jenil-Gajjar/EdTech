@@ -2,7 +2,7 @@ using EdTech.Quiz.Domain.Entities;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
 
 namespace EdTech.Quiz.Infrastructure.Repositories;
 

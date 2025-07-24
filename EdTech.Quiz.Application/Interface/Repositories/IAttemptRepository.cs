@@ -1,4 +1,4 @@
-using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
 using EdTech.Quiz.Domain.Entities;
 
 namespace EdTech.Quiz.Application.Interface.Repositories;

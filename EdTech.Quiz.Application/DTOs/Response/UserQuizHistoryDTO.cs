@@ -1,4 +1,4 @@
-namespace EdTech.Quiz.Application.DTOs;
+namespace EdTech.Quiz.Application.Response.DTOs;
 
 public class UserQuizHistoryDTO
 {

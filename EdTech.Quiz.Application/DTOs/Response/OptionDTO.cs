@@ -1,5 +1,4 @@
-namespace EdTech.Quiz.Application.DTOs;
-
+namespace EdTech.Quiz.Application.DTOs.Response;
 public class OptionDTO
 {
     public int Id { get; set; }

@@ -1,4 +1,4 @@
-namespace EdTech.Quiz.Application.DTOs;
+namespace EdTech.Quiz.Application.DTOs.Response;
 
 public class QuestionDTO
 {

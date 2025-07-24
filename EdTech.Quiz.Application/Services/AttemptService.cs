@@ -1,4 +1,7 @@
 using EdTech.Quiz.Application.DTOs;
+using EdTech.Quiz.Application.DTOs.Request;
+using EdTech.Quiz.Application.DTOs.Response;
+using EdTech.Quiz.Application.Exceptions;
 using EdTech.Quiz.Application.Interface.Repositories;
 using EdTech.Quiz.Application.Interface.Services;
 using EdTech.Quiz.Domain.Entities;
@@ -23,7 +26,7 @@ public class AttemptService : IAttemptService
 
     public async Task<int> StartAttemptAsync(StartQuizAttemptDTO dto)
     {
-        if (await _attemptRepository.HasUserAttemptedQuizAsync(dto)) throw new Exception("User has already attempted this quiz.");
+        if (await _attemptRepository.HasUserAttemptedQuizAsync(dto)) throw new UserAlreadyAttemptedQuizException();
 
         UserQuizAttempt attempt = new()
         {
@@ -43,18 +46,18 @@ public class AttemptService : IAttemptService
     public async Task<QuizResultDTO> SubmitAttemptAsync(UserQuizAttemptDTO dto)
     {
 
-        IQueryable<Question> questions = _questionRepository.GetQuestionsByQuizId(dto.QuizId) ?? throw new Exception("Quiz not found.");
+        IQueryable<Question> questions = _questionRepository.GetQuestionsByQuizId(dto.QuizId) ?? throw new QuizNotFoundException();
 
-        UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new Exception("Please start quiz first.");
+        UserQuizAttempt attempt = await _attemptRepository.GetUserQuizAttemptAsync(UserId: dto.UserId, QuizId: dto.QuizId) ?? throw new QuizNotStartedException();
 
-        var ids = dto.Answers.Select(u => u.QuestionId);
+        IEnumerable<int> ids = dto.Answers.Select(u => u.QuestionId);
         bool areEquals = new HashSet<int>(ids).SetEquals(questions.Select(u => u.Id));
-        if (!areEquals) throw new Exception("Invalid Question Ids.");
+        if (!areEquals) throw new QuestionInvalidIdsException();
 
-        if (attempt.CompletedAt is not null) throw new Exception("You have already completed this quiz.");
+        if (attempt.CompletedAt is not null) throw new QuizAlreadyCompletedException();
         attempt.CompletedAt = DateTime.UtcNow;
 
-        if (!IsAttemptWithinTimeLimit(attempt)) throw new Exception("Quiz attempt exceeded 30-minute time limit.");
+        if (!IsAttemptWithinTimeLimit(attempt)) throw new QuizAttemptTimeLimitException();
 
         attempt.Score = CalculateScore(attempt, dto, questions.ToList());
 

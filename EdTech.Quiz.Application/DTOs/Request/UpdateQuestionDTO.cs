@@ -1,5 +1,7 @@
-namespace EdTech.Quiz.Application.DTOs;
 
+using EdTech.Quiz.Application.DTOs.Response;
+
+namespace EdTech.Quiz.Application.DTOs.Request;
 public class UpdateQuestionDTO
 {
     public int Id { get; set; }
